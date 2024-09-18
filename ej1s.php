@@ -6,7 +6,8 @@
     $oct2="33";
     $oct3="4";
     $oct4="2";
-    echo sprintf("La ip 10.33.4.2 es %08b.%08b.%08b.%08b", $oct1,$oct2,$oct3,$oct4);
+    $binario = sprintf("La ip 10.33.4.2 es %08b.%08b.%08b.%08b", $oct1,$oct2,$oct3,$oct4);
+    echo $binario;
 ?>
 </BODY>
 </HTML>

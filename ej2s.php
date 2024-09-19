@@ -2,12 +2,13 @@
 <HEAD><TITLE> EJ1-Conversion IP Decimal a Binario </TITLE></HEAD>
 <BODY>
 <?php
-    $ip = array(10,33,4,2);
+    $ip = explode(".","10.33.4.2");
     $ipFinal = " ";
     for ($i=0; $i <4 ; $i++) 
     { 
         $octal = $ip[$i];
-        (String) $octalSinCeros = decbin($octal) ;
+        $octalSinCeros = decbin($octal);
+        settype ($octalSinCeros,"string") ;
         while (strlen($octalSinCeros) < 8)
         $octalSinCeros = "0" . $octalSinCeros;
         $ipFinal = $ipFinal . "." . $octalSinCeros;

@@ -8,8 +8,23 @@
     $array1 = array("Sistemas Informáticos","FOL","Mecanizado");
     $array2 = array("Desarrollo Web ES","Desarrollo Web EC","Despliegue","Desarrollo Interfaces", "Inglés");
     $arrayCompleta = array();
-    foreach ($array0 as $i ) 
-        $arrayCompleta = $arrayCompleta . $i;
+    $nombre = "array";
+    $i = 0;
+    while ($i < (count($array0)+count($array1)+count($array2))) {
+        $arrayAux = ($i < 3) ? ${$nombre.'0' } : ($i >= 3 && $i <= 5 ) ? ${$nombre.'1' } : ${$nombre.'0' };
+        $j = 0;
+        while ($j < count($arrayAux))
+        {
+            $arrayCompleta[$i] = $arrayAux[$j];
+            $j += 1;
+            $i += 1;  
+        }   
+    }
+
+
+    
+    foreach ($arrayCompleta as $i ) 
+        echo $i . "<br>";
     
 
 

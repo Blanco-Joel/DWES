@@ -4,8 +4,8 @@
 <?php
 
 
-    $array = [];
-    $arrayVuelta = [];
+    $array = array();
+    $arrayVuelta = array();
     for ($i=0; $i <= 20 ; $i++) 
         array_push($array,sprintf("%08b", $i)); 
     foreach ($array as $i) 

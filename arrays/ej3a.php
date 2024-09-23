@@ -2,9 +2,7 @@
 <HEAD><TITLE> EJ2-Direccion Red – Broadcast y Rango</TITLE></HEAD>
 <BODY>
 <?php
-
-
-    $array = [];
+    $array = array();
     for ($i=0; $i <= 20 ; $i++) 
         array_push($array,sprintf("%b", $i)); 
     

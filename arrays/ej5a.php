@@ -11,7 +11,7 @@
     $nombre = "array";
     $i = 0;
     while ($i < (count($array0)+count($array1)+count($array2))) {
-        $arrayAux = ($i < 3) ? ${$nombre.'0' } : ($i >= 3 && $i <= 5 ) ? ${$nombre.'1' } : ${$nombre.'0' };
+        $arrayAux = ($i < 3) ? ${$nombre.'0' } : ($i >= 3 && $i <= 5 ) ? ${$nombre.'1' } : ${$nombre.'2' };
         $j = 0;
         while ($j < count($arrayAux))
         {

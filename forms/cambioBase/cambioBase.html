@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+	<head>
+        <title>Binario</title>
+		<meta charset="UTF-8">
+        <meta name="Author" content="Joel Blanco">
+	</head>
+	<body>
+		<header>
+            <h1>Binario</h1>
+		</header>
+		<nav>
+		</nav>
+		<main>
+			<section>
+				<article>
+					<div>
+                        <form name="formulario" method="post" action="./php/cambioBase.php" >
+							<label >Numero Decimal</label><br/>
+							<input type="text" name="decimal"/><br/>
+							<label>Selecciona una operación:</label><br/>
+							<input type="radio" id="binario" name="conversion" value="binario-2">
+							<label for="binario">Binario</label><br>
+							<input type="radio" id="octal" name="conversion" value="octal-8">
+							<label for="octal">Octal</label><br>				
+							<input type="radio" id="hexadecimal" name="conversion" value="hexadecimal-16">
+							<label for="hexadecimal">Hexadecimal</label><br>
+							<input type="radio" id="todas" name="conversion" value="todas">
+							<label for="todas">Todas las anteriores</label><br>
+							<input type="submit" name="submit" value="enviar"/>
+							<input type="reset" name="reset" value="Borrar"/>
+						</form>
+					</div>
+				</article>
+			</section>
+		</main>
+		<footer>
+		</footer>
+		<aside>
+		</aside>
+	</body>
+</html>

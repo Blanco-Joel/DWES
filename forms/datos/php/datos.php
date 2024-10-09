@@ -16,14 +16,14 @@
             echo "</table>";
         }
         
-        fileDatos($nombre,$ape1,$ape2,$email,$sexo)
+        function fileDatos($nombre,$ape1,$ape2,$email,$sexo)
         {
             $txt = "\nNombre : ". $nombre;
-            $txt +="\nApellidos : ".$ape1 . " " . $ape2;
-            $txt +="\nEmail : ".$email;
-            $txt +="\nSexo : ".$sexo;
+            $txt .="\nApellidos : ".$ape1 . " " . $ape2;
+            $txt .="\nEmail : ".$email;
+            $txt .="\nSexo : ".$sexo;
             $archivo = fopen("../datos.txt", "w");
-            fwrite($txt,$archivo);
+            fwrite($archivo,$txt);
             fclose($archivo);   
         }
 

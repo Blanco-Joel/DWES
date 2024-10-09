@@ -11,11 +11,11 @@
         
         function imprimirTabla($numeroAnterior, $baseAnterior, $numeroNuevo, $baseNueva)
         {
-            echo "<p>El numero".$numeroAnterior." en base ". $baseAnterior. " es ". $numeroNuevo . "en base " . $baseNueva. "</p>";
+            echo "<p>El numero".$numeroAnterior." en base ". $baseAnterior. " es ". $numeroNuevo . " en base " . $baseNueva. "</p>";
         }
 
         function recogerDatos(){
-            $baseNueva = limpiar($_POST["base"])
+            $baseNueva = limpiar($_POST["base"]);
             $numero = limpiar(strval($_POST["numero"]));
             $numero = explode("/", $numero);
             $numero[1] = intval($numero[1]);

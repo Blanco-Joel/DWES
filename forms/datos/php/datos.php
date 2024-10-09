@@ -8,23 +8,36 @@
 <body>
     <h1>Binario</h1>
     <?php
-        function imprimirDecimal($decimal)
+        function imprimirDatos($nombre,$ape1,$ape2,$email,$sexo)
         {
-            echo "<label >IP Decimal</label><br/><input type'text' name='decimal' value=".$decimal."><br/>";
+            echo "<table border=1>";
+            echo "<tr><th>Nombre</th><th>Apellidos</th><th>Email</th><th>Sexo</th></tr>";
+            echo "<tr><td>$nombre</td><td>$ape1 "."$ape2</td><td>$email</td><td>$sexo</tD></tr>";
+            echo "</table>";
         }
-        function imprimirBinario($binario)
+        
+        fileDatos($nombre,$ape1,$ape2,$email,$sexo)
         {
-            echo "<label >IP binaria</label><br/><input type='text' name='binaria'  value =".$binario." ><br/>";
-        }
-        function recogerDatos ()
-        {   
-            $decimal = limpiar($_POST["decimal"]);
-            $ip = explode(".",$decimal);
-            $binario = sprintf("%08b.%08b.%08b.%08b", $ip[0],$ip[1],$ip[2],$ip[3]);
-            imprimirDecimal($decimal);
-            imprimirBinario($binario);
+            $txt = "\nNombre : ". $nombre;
+            $txt +="\nApellidos : ".$ape1 . " " . $ape2;
+            $txt +="\nEmail : ".$email;
+            $txt +="\nSexo : ".$sexo;
+            $archivo = fopen("../datos.txt", "w");
+            fwrite($txt,$archivo);
+            fclose($archivo);   
         }
 
+        function recogerDatos ()
+        {   
+            $nombre = limpiar($_POST["nombre"]);
+            $ape1 = limpiar($_POST["ape1"]);
+            $ape2 = limpiar($_POST["ape2"]);
+            $email = limpiar($_POST["email"]);
+            $sexo = limpiar($_POST["sexo"]);
+            imprimirDatos($nombre,$ape1,$ape2,$email,$sexo);
+            fileDatos($nombre,$ape1,$ape2,$email,$sexo);
+        }
+        
         function limpiar($data)
         {
             $data = trim($data);
@@ -32,6 +45,7 @@
             $data = htmlspecialchars($data);
             return $data;
         }
+
         recogerDatos();
         
         ?>

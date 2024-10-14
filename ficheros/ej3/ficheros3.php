@@ -22,7 +22,7 @@
                             $cont = 0;
                             imprimirInicioTabla();
                             while ($fila != "") {
-                                $fila = explode(" ",$fila );
+                                $fila = explode(chr(32),$fila );
                                 limpiarFila($fila);
                                 $fila = fgets($archivo);
                                 $cont +=1;

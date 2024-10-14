@@ -1,6 +1,6 @@
 <html lang="es">
 	<head>
-        <title>Ficheros 3</title>
+        <title>Ficheros 4</title>
 		<meta charset="UTF-8">
         <meta name="Author" content="Joel Blanco">
 	</head>
@@ -14,38 +14,46 @@
 			<section>
 				<article>
 					<?php
-
-                        function fileDatos($nombre,$ape1,$ape2,$localidad,$fechaNac)
+                        function fileDatos()
                         {
-                            $fila = ""; 
-                            $fila .= $nombre ."##";
-                            $fila .= $ape1 ."##";
-                            $fila .= $ape2 ."##";
-                            $fila .= $fechaNac ."##";
-                            $fila .= $localidad . "\n";
-                            $archivo = fopen("alumnos2.txt", "a") or die("No existe el fichero"); 
-                            fwrite($archivo,$fila);
+                            $archivo = fopen("alumnos2.txt", "r") or die("No existe el fichero"); 
+                            $fila = fgets($archivo);
+                            $cont = 0;
+                            imprimirInicioTabla();
+                            while ($fila != "") {
+                                $fila = explode(chr(35).chr(35),$fila );
+                                limpiarFila($fila);
+                                $fila = fgets($archivo);
+                                $cont +=1;
+                            }
+                            imprimirFinalTabla($cont);
                             fclose($archivo);   
                         }
-                        function recogerDatos ()
-                        {   
-                            $nombre = limpiar($_POST["nombre"]);
-                            $ape1 = limpiar($_POST["ape1"]);
-                            $ape2 = limpiar($_POST["ape2"]);
-                            $localidad = limpiar($_POST["localidad"]);
-                            $fechaNac = limpiar($_POST["fechaNac"]);
-                            fileDatos($nombre,$ape1,$ape2,$localidad,$fechaNac);
-                        }
-                        
-                        function limpiar($data)
+
+                        function limpiarFila($fila)
                         {
-                            $data = trim($data);
-                            $data = stripslashes($data);
-                            $data = htmlspecialchars($data);
-                            return $data;
+                            $filaLimpia = array();
+                            for ($i=0; $i < count($fila); $i++) { 
+                                if ($fila[$i] != '')
+                                    array_push($filaLimpia,$fila[$i]);
+                            }
+                            imprimirDatos($filaLimpia);
                         }
-                        if ($_SERVER["REQUEST_METHOD"] == "POST")  
-                            recogerDatos();    
+                        function imprimirInicioTabla()
+                        {
+                            echo "<table border=1>";
+                            echo "<tr><th>Nombre</th><th>Apellidos</th><th>Fecha de Nacimiento</th><th>Localidad</th></tr>";
+                        }
+                        function imprimirDatos($filaLimpia)
+                        {
+                            echo "<tr><td>$filaLimpia[0]</td><td>$filaLimpia[1]"." "."$filaLimpia[2]</td><td>$filaLimpia[3]</td><td>$filaLimpia[4]</tD></tr>";
+                        }
+                        function imprimirFinalTabla($cont)
+                        {
+                            echo "</table>";
+                            echo "Se han impreso " . $cont . " filas de datos. ";
+                        }
+                            fileDatos();    
                     ?>
 				</article>
 			</section>

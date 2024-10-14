@@ -1,6 +1,6 @@
 <html lang="es">
 	<head>
-        <title>Ficheros 1</title>
+        <title>Ficheros 2</title>
 		<meta charset="UTF-8">
         <meta name="Author" content="Joel Blanco">
 	</head>
@@ -27,25 +27,18 @@
 						</form>
 					</div>
 					<?php
+
                         function fileDatos($nombre,$ape1,$ape2,$localidad,$fechaNac)
                         {
                             $fila = ""; 
-                            $fila .= sumarEspacios($nombre,strlen($fila),40);
-                            $fila .= sumarEspacios($ape1,strlen($fila),81);
-                            $fila .= sumarEspacios($ape2,strlen($fila),123);
-                            $fila .= sumarEspacios($fechaNac,strlen($fila),133);
-                            $fila .= sumarEspacios($localidad,strlen($fila),160) . "\n";
-                            $archivo = fopen("alumnos1.txt", "a") or die("No existe el fichero"); 
+                            $fila .= $nombre ."##";
+                            $fila .= $ape1 ."##";
+                            $fila .= $ape2 ."##";
+                            $fila .= $fechaNac ."##";
+                            $fila .= $localidad . "\n";
+                            $archivo = fopen("alumnos2.txt", "a") or die("No existe el fichero"); 
                             fwrite($archivo,$fila);
                             fclose($archivo);   
-                        }
-                        function sumarEspacios($dato, $inicio, $final)
-                        {
-                            while ($inicio+strlen($dato) < $final-1) 
-                                $dato .= " ";
-                            
-                            return $dato;
-
                         }
                         function recogerDatos ()
                         {   

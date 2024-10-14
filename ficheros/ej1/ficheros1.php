@@ -14,7 +14,7 @@
 			<section>
 				<article>
 					<div>
-						<form method="Post"  action="./php/datos.php" >
+						<form method="Post"  action=<?php echo  htmlspecialchars($_SERVER["PHP_SELF"]) ?>  >
 							<label for="nombre" >Nombre :</label><input type="text" name="nombre" id="nombre" ><br>
 							<label for="ape1" >Apellido 1:</label> <input type="text" name="ape1" id="ape1" ><br>
 							<label for="ape2" >Apellido 2:</label> <input type="text" name="ape2" id="ape2" ><br>
@@ -35,14 +35,15 @@
                             $fila .= sumarEspacios($ape2,strlen($fila),123);
                             $fila .= sumarEspacios($fechaNac,strlen($fila),133);
                             $fila .= sumarEspacios($localidad,strlen($fila),160);
-                            $fichero = fopen("alumnos1.txt", "w") or die("No existe el fichero"); 
+                            $archivo = fopen("alumnos1.txt", "w") or die("No existe el fichero"); 
                             fwrite($archivo,$fila);
                             fclose($archivo);   
                         }
                         function sumarEspacios($dato, $inicio, $final)
                         {
-                            for ($i=$inicio; $i <=final ; $i++) 
+                            while ($inicio+strlen($dato) < $final-1) 
                                 $dato .= " ";
+                            
                             return $dato;
 
                         }
@@ -53,7 +54,6 @@
                             $ape2 = limpiar($_POST["ape2"]);
                             $localidad = limpiar($_POST["localidad"]);
                             $fechaNac = limpiar($_POST["fechaNac"]);
-                            imprimirDatos($nombre,$ape1,$ape2,$localidad,$fechaNac);
                             fileDatos($nombre,$ape1,$ape2,$localidad,$fechaNac);
                         }
                         
@@ -64,8 +64,8 @@
                             $data = htmlspecialchars($data);
                             return $data;
                         }
-                
-                        recogerDatos();    
+                        if ($_SERVER["REQUEST_METHOD"] == "POST")  
+                            recogerDatos();    
                     ?>
 				</article>
 			</section>

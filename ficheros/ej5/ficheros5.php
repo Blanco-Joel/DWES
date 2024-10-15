@@ -23,53 +23,46 @@
                             <input type="submit" value="enviar">
                             <input type="reset" value="borrar">
                         </form>
+                        <br><br>
 					<?php
                         function recogerDatos()
                         {
-                            $archivo = fopen("alumnos2.txt", "r") or die("No existe el fichero"); 
-                            $fila = fgets($archivo);
+                            $archivo = fopen($_POST["fichero"], "r") or die("No existe el fichero"); 
                             $cont = 0;
-                            imprimirInicioTabla();
-                            while ($fila != "") {
-                                $fila = explode(chr(35).chr(35),$fila );
-                                limpiarFila($fila);
-                                $fila = fgets($archivo);
-                                $cont +=1;
+                            switch ($_POST["operacion"]) {
+                                case 'mostrar':
+                                    $fila = fgets($archivo);
+                                    while ($fila != "") {
+                                        imprimirDatos($fila);
+                                        $fila = fgets($archivo);
+                                    }
+                                    break;
+                                case 'linea':
+                                    $fila = fgets($archivo);
+                                    while ($cont < $_POST["lineaSuelta"]) {
+                                        $fila = fgets($archivo);
+                                        $cont +=1;
+                                    }
+                                    imprimirDatos($fila);
+                                    break;
+                                case 'lineas':
+                                    $fila = fgets($archivo);
+                                    while ($cont <= $_POST["primerasLineas"]) {
+                                        imprimirDatos($fila);
+                                        $fila = fgets($archivo);
+                                        $cont +=1;
+                                    }
+                                    break;
+                                default:
+                                    # code...
+                                    break;
                             }
-                            imprimirFinalTabla($cont);
-                            fclose($archivo);   
+                        }
+                        function imprimirDatos($fila)
+                        {
+                            echo $fila;
                         }
 
-                        function limpiarFila($fila)
-                        {
-                            $filaLimpia = array();
-                            for ($i=0; $i < count($fila); $i++) { 
-                                if ($fila[$i] != '')
-                                    array_push($filaLimpia,$fila[$i]);
-                            }
-                            imprimirDatos($filaLimpia);
-                        }
-                        function imprimirInicioTabla()
-                        {
-                            echo "<table border=1>";
-                            echo "<tr><th>fichero</th><th>Apellidos</th><th>Fecha de Nacimiento</th><th>Localidad</th></tr>";
-                        }
-                        function imprimirDatos($filaLimpia)
-                        {
-                            echo "<tr><td>$filaLimpia[0]</td><td>$filaLimpia[1]"." "."$filaLimpia[2]</td><td>$filaLimpia[3]</td><td>$filaLimpia[4]</tD></tr>";
-                        }
-                        function imprimirFinalTabla($cont)
-                        {
-                            echo "</table>";
-                            echo "Se han impreso " . $cont . " filas de datos. ";
-                        }
-                        function limpiar($data)
-						{
-							$data = trim($data);
-							$data = stripslashes($data);
-							$data = htmlspecialchars($data);
-							return $data;
-						}
                         if ($_SERVER["REQUEST_METHOD"] == "POST")  
                             recogerDatos();		
                         

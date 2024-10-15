@@ -13,7 +13,7 @@
 		<main>
 			<section>
 				<article>
-                        <form method="Post"   action=<?php $_SERVER['PHP_SELF']; ?> >
+                        <form method="Post"   action=<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> >
                             Fichero Origen (path/nombre)  :<input type="text" name="ficheroOrigen" required><br>
                             Fichero Destino (path/nombre) :<input type="text" name="ficheroDestino"><br>
                             Operaciones: <br>
@@ -97,7 +97,8 @@
                             echo "<p>" . $mensaje . "</p>";
                         }
                         ?>
-<?php
+
+                        <?php
                         if ($_SERVER["REQUEST_METHOD"] == "POST")  
                             recogerDatos();		
                         

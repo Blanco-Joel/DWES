@@ -27,47 +27,77 @@
 					<?php
                         function recogerDatos()
                         {
-                            $archivoOr = realpath($_POST["ficheroOrigen"]);
+
+                            /*var_dump (realpath(dirname(basename($_SERVER['PHP_SELF']))));*/
+                            $archivoOr = strtolower(realpath($_POST["ficheroOrigen"]));
+                            var_dump($archivoOr);
                             if (!file_exists($archivoOr))
-                                imprimirError();
+                                imprimirFinal("LA RUTA O EL ARCHIVO SON INCORRECTOS");
                             else
                             {
                                 switch ($_POST["operacion"]) {
                                     case 'copiar':
-                                        copiarFichero($archivoOr)
+                                        copiarRenombrarFichero($archivoOr,$_POST["operacion"]);
                                         break;
                                     case 'renombrar':
-                                        renombrarFichero($archivoOr)
+                                        copiarRenombrarFichero($archivoOr,$_POST["operacion"]);
 
                                         break;
                                     case 'borrar':
-                                        borrarFichero($archivoOr)
+                                        borrarFichero($archivoOr);
 
                                         break;              
                                 }
                             }
                         }
-                        function sacarDatosArchivo($archivo)
+                        function copiarRenombrarFichero($archivoOr)
                         {
-                            $nombre = basename($archivo);
-                            $ruta = dirname(realpath($archivo));
-                            $tamanio= filesize($archivo);
-                            $ultimaModif =  date("d/M/Y H:i:s.", filemtime($archivo));
-                            imprimirDatos($nombre,$ruta,$tamanio,$ultimaModif);
+                            $archivoFi = strtolower($_POST["ficheroDestino"]);
+                            if (!comprobarDestino($archivoFi)) 
+                                echo "La ruta de destino ha de empezar por c:";
+                            else{
+                                if (!file_exists(dirname($archivoFi)))
+                                {
+                                    imprimirFalloDestino($archivoFi);
+                                    mkdir(dirname($archivoFi),0777,true);
+                                }
+                                if ($_POST["operacion"] == 'copiar') {
+                                    copy($archivoOr,$archivoFi);
+                                    imprimirFinal("Se ha copiado con exito");
+                                }else{
+                                    rename($archivoOr,$archivoFi);
+                                    imprimirFinal("Se ha renombrado con exito");
+                                }
+
+                            }
+                        }
+                        
+                        function borrarFichero($archivoOr)
+                        {
+                            unlink($archivoOr);
+                            imprimirFinal("Se ha eliminado con exito");
                         }
 
-                        function imprimirDatos($nombre,$ruta,$tamanio,$ultimaModif)
-                        {
-                            echo "<h3>Nombre del Fichero :". $nombre  . " </h3> ";
-                            echo "<h3>Directorio :" . $ruta . " </h3> ";
-                            echo "<h3>Tamaño del fichero :" . $tamanio  . " Kb  </h3> ";
-                            echo "<h3>Ultima modificación :" . $ultimaModif . " </h3> ";
-                        }
-                        function imprimirError()
-                        {
-                            echo "LA RUTA O EL ARCHIVO SON INCORRECTOS";
-                        }
 
+                        function comprobarDestino($archivoFi)
+                        {
+                            $valido = true;
+                            $rutaArray = explode(chr(47),$archivoFi);
+                            if ($rutaArray[0] != "c:") 
+                               $valido = false;
+                            return $valido;
+                        }
+                        function imprimirFalloDestino($archivoFi)
+                        {
+                            echo "<p> No existe la ruta " . dirname($archivoFi) . "</p>";
+                            echo "<p> Se ha creado la ruta " . dirname($archivoFi) . "</p>";
+                        }
+                        function imprimirFinal($mensaje)
+                        {
+                            echo "<p>" . $mensaje . "</p>";
+                        }
+                        ?>
+<?php
                         if ($_SERVER["REQUEST_METHOD"] == "POST")  
                             recogerDatos();		
                         

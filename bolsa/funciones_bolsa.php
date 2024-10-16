@@ -18,7 +18,7 @@
         while ($linea[0] != "") {
             $linea = explode(" ",$linea);
             if ($linea[0] == $valor) 
-            imprimirLinea(implode(" ",$linea));
+                imprimirLinea(implode(" ",$linea));
             $linea = fgets($archivo);
         }
         fclose($archivo);
@@ -28,12 +28,15 @@
     {
         $archivo = fopen('ibex35.txt','r') or die("No se encuentra el fichero");
         $linea = fgets($archivo);
-        $lineaLey = explode(" ",$linea);
-
+        $lineaNueva = array();
         while ($linea[0] != "") {
-            $linea = explode(" ",$linea);
-            if ($linea[0] == $valor) 
-                
+            $linea = explode(" " , $linea);
+            if ($linea[0] == $valor) {
+                foreach ($linea as $campo) 
+                    if ($campo != '') 
+                        array_push($lineaNueva, $campo);
+                imprimirCotizaciones($lineaNueva[0],$lineaNueva[1],$lineaNueva[5], $lineaNueva[6]);
+            }
             $linea = fgets($archivo);
         }
         fclose($archivo);
@@ -42,12 +45,13 @@
 
 ?>
 <?php //CREAR OPTIONS-----------------------------------------------------------------------------------
+
     function crearDesplegable()
     {
         $archivo = fopen('ibex35.txt','r') or die("No se encuentra el fichero");
         $linea = fgets($archivo);
-        $linea = explode(" ",$linea);
-        imprimirInicioDesplegable();
+        $linea = explode('/chr(32).chr(32)/',$linea);
+        imprimirInicioDesplegable("valor");
         while ($linea[0] != "") {
             imprimirCuerpoDesplegable($linea[0]);
             $linea = fgets($archivo);
@@ -55,6 +59,19 @@
         }
         imprimirFinalDesplegable();
     }
+
+    function crearDesplegableIndice()
+    {
+        $archivo = fopen('ibex35.txt','r') or die("No se encuentra el fichero");
+        $linea = fgets($archivo);
+        $linea = explode('/chr(32).chr(32)/',$linea);
+        imprimirInicioDesplegable("indice");
+        foreach ($linea as $campo) 
+            if ($campo != '') 
+                imprimirCuerpoDesplegable($campo);
+        imprimirFinalDesplegable();
+    }
+
 ?>
 <?php //LECTURA DATOS-----------------------------------------------------------------------------------
     function recogerDatos ($llamada)
@@ -79,17 +96,26 @@
     {
         echo "<p>" . $linea . "</p>";
     }
-    function imprimirInicioDesplegable()
+
+    function imprimirInicioDesplegable($name)
     {
-        echo "<select name=\"valor\">";
+        echo "<select name=\"" . $name . "\">";
     }
+
     function imprimirCuerpoDesplegable($dato)
     {
         echo "<option value=\"" . $dato . "\">". $dato ."</option>";
     }
+    
     function imprimirFinalDesplegable()
     {
         echo "</select>";
+    }
+    function imprimirCotizaciones($nombre, $valor, $max, $min)
+    {
+        echo "<p> Cotizacion Actual de " . $nombre . " : " . $valor. "</p>";
+        echo "<p> Cotizacion mínima de " . $nombre . " : " . $min. "</p>";
+        echo "<p> Cotizacion máxima de " . $nombre . " : " . $max. "</p>";
     }
 
 ?>

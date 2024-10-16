@@ -18,6 +18,7 @@
 						<?php
 						 	include('./funciones_bolsa.php');
 							crearDesplegable();
+							crearDesplegableIndice();
 						?>
 						<br>
 							<input type="submit" value="enviar">

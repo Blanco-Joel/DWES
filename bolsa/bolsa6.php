@@ -14,27 +14,11 @@
 			<section>
 				<article>
 					<div>
-						<?PHP include('./funciones_bolsa.php');?>
-						<form method="post"  action = <?php echo  htmlspecialchars($_SERVER["PHP_SELF"]) ?>>		
-						<label for="totales">Mostrar : </label>
-						<select name="Totales" id="totales" required>
-							<option value="7">Total Volumen</option>
-							<option value="8">Total Capitalizacion</option>
-						</select>
-						<br>
-
-						<br>
-							<input type="submit" value="enviar">
-							<input type="reset" value="borrar">
-						<br>
-						</form>
-					</div>
-					<?php
+						<?PHP
+						include('./funciones_bolsa.php');
+						maximoMinimo();
 						
-						if ($_SERVER["REQUEST_METHOD"] == "POST") {
-							recogerDatosTotales();     
-						}
-                    ?>
+                    	?>
 				</article>
 			</section>
 		</main>

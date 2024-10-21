@@ -50,6 +50,7 @@
     {
         $archivo = fopen('ibex35.txt','r') or die("No se encuentra el fichero");
         $linea = fgets($archivo);
+        
         $suma = 0;
         while ($linea[0] != "") {
             $linea = separarCampos($linea);
@@ -59,6 +60,49 @@
         $total = ($total == 7) ? "Total Volumen" : "Total Capitalizacion";
         imprimirTotal($suma,$total);
         fclose($archivo);
+    }
+
+    function maximoMinimo()
+    {
+        $archivo = fopen('ibex35.txt','r') or die("No se encuentra el fichero");
+        $linea = fgets($archivo);
+        $linea = fgets($archivo);
+
+        $cotizacion = array();
+        $volumen = array();
+        $capitalizacion = array();
+        while ($linea[0] != "") {
+            $linea = separarCampos($linea);
+            array_push($cotizacion,doubleval(str_replace(",",".",$linea[1])));
+            array_push($volumen,intval(str_replace(".","",$linea[7])));
+            array_push($capitalizacion,intval(str_replace(".","",$linea[8])));
+            $linea = fgets($archivo);
+        }
+        sacarMaxMin($cotizacion,$volumen,$capitalizacion);
+    }
+
+    function sacarMaxMin($cotizacion,$volumen,$capitalizacion)
+    {
+        $archivo = fopen('ibex35.txt','r') or die("No se encuentra el fichero");
+        $linea = fgets($archivo);
+        $linea = fgets($archivo);
+        while ($linea[0] != "") {
+            $linea = separarCampos($linea);
+            if (doubleval(str_replace(",",".",$linea[1])) == min($cotizacion)) 
+                imprimirMinMax($linea[0],min($cotizacion),"cotización Minima");
+            if (doubleval(str_replace(",",".",$linea[1])) == max($cotizacion)) 
+                imprimirMinMax($linea[0],max($cotizacion),"cotización Máxima");
+            if (intval(str_replace(".","",$linea[7])) == min($volumen)) 
+                imprimirMinMax($linea[0],min($volumen),"volumen Minima");
+            if (intval(str_replace(".","",$linea[7])) == max($volumen)) 
+                imprimirMinMax($linea[0],max($volumen),"volumen Máximo");
+            if (intval(str_replace(".","",$linea[8])) == min($capitalizacion)) 
+                imprimirMinMax($linea[0],min($capitalizacion),"capitalización Minima");
+            if (intval(str_replace(".","",$linea[8])) == max($capitalizacion)) 
+                imprimirMinMax($linea[0],max($capitalizacion),"capitalización Máxima");
+            $linea = fgets($archivo);
+        }
+        
     }
 
     function separarCampos($linea)
@@ -160,12 +204,16 @@
         echo "<p> Cotizacion mínima de " . $nombre . " : " . $min. "</p>";
         echo "<p> Cotizacion máxima de " . $nombre . " : " . $max. "</p>";
     }
-    function imprimiriNDICE($nombre, $valor,$nombreCampo)
+    function imprimirIndice($nombre, $valor,$nombreCampo)
     {
         echo "<p>" . $nombreCampo . " de " . $nombre . " : " . $valor. "</p>";
     }
     function imprimirTotal($suma,$total) 
     {
         echo "<p>" .$total. ": " . $suma . "</p>";
+    }
+    function imprimirMinMax($nombre,$valor,$mensaje)
+    {
+        echo "<p>" . $mensaje . " : " . $nombre . "| valor : " . $valor . "</p>";
     }
 ?>

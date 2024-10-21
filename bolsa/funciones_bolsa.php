@@ -46,6 +46,20 @@
         }
         fclose($archivo);
     }
+    function sacarTotales($total)
+    {
+        $archivo = fopen('ibex35.txt','r') or die("No se encuentra el fichero");
+        $linea = fgets($archivo);
+        $suma = 0;
+        while ($linea[0] != "") {
+            $linea = separarCampos($linea);
+            $suma += intval(str_replace(".","",$linea[$total]));
+            $linea = fgets($archivo);
+        }
+        $total = ($total == 7) ? "Total Volumen" : "Total Capitalizacion";
+        imprimirTotal($suma,$total);
+        fclose($archivo);
+    }
 
     function separarCampos($linea)
     {
@@ -103,7 +117,13 @@
         $llamada = explode("/",$llamada);
         $llamada[3] == "bolsa2.php" ? buscarValor($valor) : buscarValorCot($valor,$indice);
     }
-    
+
+    function recogerDatosTotales()
+    {   
+        $total = limpiar($_POST["Totales"]);
+        sacarTotales(intval($total));
+    }
+
     function limpiar($data)
     {
         $data = trim($data);
@@ -143,5 +163,9 @@
     function imprimiriNDICE($nombre, $valor,$nombreCampo)
     {
         echo "<p>" . $nombreCampo . " de " . $nombre . " : " . $valor. "</p>";
+    }
+    function imprimirTotal($suma,$total) 
+    {
+        echo "<p>" .$total. ": " . $suma . "</p>";
     }
 ?>

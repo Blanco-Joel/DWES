@@ -23,6 +23,7 @@
         <input type="reset" value="Borrar">
     </form>
     <?php
+    
 $archivo = file_get_contents("pronosticotiempoLasRozas.xml");
     
 $xml = new SimpleXMLElement($archivo);

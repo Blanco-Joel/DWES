@@ -1,29 +1,43 @@
 
-
+<?php //CONSTANTES-----------------------------------------------------------------------------------------------------------------
+    define("SERVERNAME","localhost");
+    define("USERNAME","root");
+    define("PASSWORD","rootroot");
+    define("DBNAME","empleadosnm");
+?>
 <?php //LÓGICA---------------------------------------------------------------------------------------------------------------------
-function introducirDpto$servername = "localhost";
-$username = "root";
-$password = "rootroot";
-$dbname = "empleadosnm";
+var_dump(SERVERNAME);
+    /*Recibe el nombre del . */
+    function introducirDpto($nombre)
+    {
+        try {
+            $conn = new PDO("mysql:host=SERVERNAME;dbname=DBNAME", USERNAME,PASSWORD); 
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare("INSERT INTO dpto (cod_dpto,nombre) values  (:cod_dpto,:nombre) ");
+            $cod_dpto = sacarCodDpto("SELECT cod_dpto FROM dpto ORDER BY 1 desc");
+            
+            $stmt->bindParam(':cod_dpto', $cod_dpto);
+            $stmt->bindParam(':nombre', $nombre);
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        
+            mensaje ($nombre,$cod_dpto);
+        }   
+        catch(PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+        $conn = null;
+    }
 
-try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $stmt = $conn->prepare("SELECT cod_dpto FROM dpto order by 1 desc");
-    $stmt->execute();
-    $linea = "";
-    $stmt->setFetchMode(PDO::FETCH_ASSOC);
-    $resultado=$stmt->fetchAll();
-    
-    while (strlen($linea) == 0 )
-        $linea = $resultado[0]["cod_dpto"] ;
-    
-}   
-catch(PDOException $e) {
-    echo "Error: " . $e->getMessage();
-}
-$conn = null;
-
+    function sacarCodDpto($select)
+    {
+        $cod_dpto = "";
+        $stmt = $conn->query($select);
+        $resultado=$stmt->fetchAll();
+        while (strlen($cod_dpto) == 0 )
+            $cod_dpto = $resultado[0]["cod_dpto"] ;
+        return $cod_dpto;
+    }
 ?>
 
 <?php //EXCEPCIONES----------------------------------------------------------------------------------------------------------------
@@ -45,8 +59,8 @@ $conn = null;
 
 <?php //RECOGIDA DE DATOS DE USUARIO-----------------------------------------------------------------------------------------------
     
-    /*Inicio del programa recogiendo y limpiando los datos introducidos. Devuelve 
-    todos los datos . */
+    /*Inicio del programa recogiendo y limpiando el dato introducido. Devuelve 
+    el nombre . */
     function recogerDatos()
     {   
         $nombre = limpiar($_POST["nombre"]);
@@ -57,6 +71,8 @@ $conn = null;
     }
 
 ?>
+
+
 <?php //LIMPIEZA-------------------------------------------------------------------------------------------------------------------
     
     /*Recibe una String y la limpia los datos introducidos por el usuario. Devuelve el mismo dato
@@ -69,4 +85,15 @@ $conn = null;
         return $data;
     }
 
+?>
+
+
+<?php //IMPRESIÓN------------------------------------------------------------------------------------------------------------------
+    
+    /*Recibe el nombre y el codigo del departamento e imprimie por patalla un mensaje una vez se 
+    haya introducido el mismo. */
+    function mensaje($nombre,$cod_dpto)
+    {
+        echo "Se ha introducido el departamento $nombre con el codigo $cod_dpto";
+    }
 ?>

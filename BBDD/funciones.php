@@ -6,22 +6,25 @@
     define("DBNAME","empleadosnm");
 ?>
 <?php //LÓGICA---------------------------------------------------------------------------------------------------------------------
-var_dump(SERVERNAME);
-    /*Recibe el nombre del . */
+
+    /*Recibe el nombre del departamento a introducir, abre la conexion con la BBDD y lo introduce  . */
     function introducirDpto($nombre)
     {
         try {
-            $conn = new PDO("mysql:host=SERVERNAME;dbname=DBNAME", USERNAME,PASSWORD); 
+            $conn = new PDO("mysql:host=".SERVERNAME.";dbname=".DBNAME, USERNAME,PASSWORD); 
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $stmt = $conn->prepare("INSERT INTO dpto (cod_dpto,nombre) values  (:cod_dpto,:nombre) ");
-            $cod_dpto = sacarCodDpto("SELECT cod_dpto FROM dpto ORDER BY 1 desc");
-            
-            $stmt->bindParam(':cod_dpto', $cod_dpto);
+            $cod_dpto = sacarCodDpto($conn,"SELECT cod_dpto FROM dpto ORDER BY 1 desc");
+            $cod_dpto = (substr($cod_dpto,0,-1) . (substr($cod_dpto,-1) + 1) );
+
+            $stmt->bindParam(':cod_dpto', $cod_dpto  );
             $stmt->bindParam(':nombre', $nombre);
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
         
             mensaje ($nombre,$cod_dpto);
+
+
         }   
         catch(PDOException $e) {
             echo "Error: " . $e->getMessage();
@@ -29,7 +32,9 @@ var_dump(SERVERNAME);
         $conn = null;
     }
 
-    function sacarCodDpto($select)
+    /*Recibe la conexion y la consulta y saca el último cod_dpto y lo devuelve */
+
+    function sacarCodDpto($conn,$select)
     {
         $cod_dpto = "";
         $stmt = $conn->query($select);

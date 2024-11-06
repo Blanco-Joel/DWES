@@ -23,7 +23,7 @@
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
-            $nombre = recogerDatos();
+            $nombre = recogerDatos("nombre");
             introducirDpto($nombre);
         }
     ?>

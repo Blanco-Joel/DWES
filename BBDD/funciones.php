@@ -69,14 +69,13 @@
             $conn = abrirConexion();
             $fecha_ini = date('Y-m-d');
             $cod_dpto = substr($cod_dpto,0,4);
-            var_dump($cod_dpto);
             $stmt = $conn->prepare("INSERT INTO emple (nombre,apellidos,dni,salario,fecha_nac) values  ('$nombre','$ape','$dni','$salario','$fecha_nac') ");
             $stmt->execute();
             $stmt = $conn->prepare("INSERT INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
             $stmt->execute();
             
         
-            mensajeEmple ($nombre,$ape,$dni,$cod_dpto);
+            mensajeEmple($dni,$cod_dpto);
 
         }   
         catch(PDOException $e) {
@@ -84,6 +83,28 @@
         }
 
         cerrarConexion($conn);
+    }
+
+    function cambiarEmpleDpto($dni,$cod_dpto)
+    {
+        $conn = abrirConexion();
+        try {
+            $conn = abrirConexion();
+            $fecha_ini = date('Y-m-d'); 
+            $stmt = $conn->prepare(" INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
+            $stmt->execute();
+            $stmt = $conn->prepare("INSERT INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
+            $stmt->execute();
+            
+        
+            mensajeEmple($dni,$cod_dpto);
+
+        }   
+        catch(PDOException $e) {
+            trigger_error("Error: " . $e->getMessage());
+        }
+        cerrarConexion($conn);
+
     }
 
 ?>
@@ -140,7 +161,7 @@
 
 <?php //CREAR OPTIONS-----------------------------------------------------------------------------------
 
-    function crearDesplegable()
+    function crearDesplegableDpto()
     {
         $conn = abrirConexion();
 
@@ -151,6 +172,21 @@
         $resultado=$stmt->fetchAll();
         foreach($resultado as $linea) 
             imprimirCuerpoDesplegable($linea["cod_dpto"]);
+
+        imprimirFinalDesplegable();
+        cerrarConexion($conn);
+    }
+    function crearDesplegableEmple()
+    {
+        $conn = abrirConexion();
+
+        imprimirInicioDesplegable("DNI");
+        $stmt = $conn->prepare("SELECT concat( emple.dni,' | ',nombre,' | ', cod_dpto ) as DNI FROM emple,emple_dpto where emple.dni = emple_dpto.dni  order by 1");
+        $stmt->execute();
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        $resultado=$stmt->fetchAll();
+        foreach($resultado as $linea) 
+            imprimirCuerpoDesplegable($linea["DNI"]);
 
         imprimirFinalDesplegable();
         cerrarConexion($conn);
@@ -166,9 +202,9 @@
     {
         echo "Se ha introducido el departamento $nombre con el codigo $cod_dpto";
     }
-    function mensajeEmple($nombre,$ape,$dni,$cod_dpto)
+    function mensajeEmple($dni,$cod_dpto)
     {
-        echo "Se ha introducido el empleado $nombre $ape con el DNI $dni en el departamento $cod_dpto ";
+        echo "Se ha introducido el empleado con el DNI $dni en el departamento $cod_dpto ";
     }
     function imprimirInicioDesplegable($name)
     {

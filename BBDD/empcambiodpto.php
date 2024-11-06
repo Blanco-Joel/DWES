@@ -17,11 +17,9 @@
 <BODY>
 
     <form name='altaDpto' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        <label >Nombre del empleado:</label> <input type='text' name='nombre' value='' size=40><br>
-        <label >Apellidos del empleado:</label> <input type='text' name='apellido' value='' size=40><br>
-        <label >DNI del empleado:</label> <input type='text' name='DNI' value='' size=9><br>
-        <label >Salario del empleado:</label> <input type='text' name='salario' value='' size=8><br>
-        <label >Fecha de nacimiento del empleado:</label> <input type='text' name='fecha_nac' value='' size=8><br>
+        <label >DNI del empleado:</label> 
+            <?php crearDesplegableEmple() ?>
+        <br><br>
         <label >Departamento del empleado:</label>
             <?php crearDesplegableDpto() ?>
         <br><br>
@@ -30,13 +28,10 @@
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
-            $nombre = recogerDatos("nombre");
-            $ape = recogerDatos("apellido");
-            $dni = recogerDatos("DNI");
-            $salario = recogerDatos("salario");
-            $fecha_nac = recogerDatos("fecha_nac");
-            $cod_dpto = recogerDatos("cod_dpto");
-            introducirEmple($nombre,$ape,$dni,$salario,$cod_dpto,$fecha_nac);
+            $dni = substr(recogerDatos("DNI"),0,9);
+            var_dump($dni);
+            $cod_dpto = substr(recogerDatos("cod_dpto"),0,4);
+            //cambiarEmpleDpto($dni,$cod_dpto);
         }
     ?>
 

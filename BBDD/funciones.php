@@ -85,6 +85,7 @@
         cerrarConexion($conn);
     }
 
+    /*Recibe los datos a cambiar en la tabla emple_dpto, abre la conexion con la BBDD y lo modifica. */
     function cambiarEmpleDpto($dni,$cod_dpto)
     {
         try {
@@ -106,6 +107,30 @@
 
     }
 
+    function listarEmplesDpto($cod_dpto)
+    {
+        try {
+            $conn = abrirConexion();
+            $stmt = $conn->prepare("SELECT emple.nombre FROM emple,emple_dpto WHERE emple.dni = emple_dpto.dni AND emple_dpto.cod_dpto = '$cod_dpto' AND fecha_fin IS NULL");
+            $stmt->execute();
+            $resultado=$stmt->fetchAll();
+            imprimirDpto($cod_dpto);
+            imprimirInicioLista();
+            foreach ($resultado as $linea ) 
+            {
+                if(!empty($linea["nombre"]))
+                    imprimirEmple($linea["nombre"]);
+                else 
+                    imprimirEmple("Ningún trabajador está en este departamento.");
+            }   
+        }
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+        cerrarConexion($conn);
+        imprimirFinLista();
+    }
+
 ?>
 
 
@@ -121,12 +146,16 @@
         }
 
     }
+
+    /*Tratamiento de excepciones recibiendo los el error de la consulta de la BBDD. En caso de fallo
+    mata el programa  */
     function erroresBBDD($error)
     {
         if (substr($error,0,15) == "SQLSTATE[23000]") 
             trigger_error("No se puede repetir la clave primaria.");
         muerte();
     }
+
     /*Mata el programa.  */
     function muerte()
     {
@@ -169,6 +198,7 @@
 
 <?php //CREAR OPTIONS-----------------------------------------------------------------------------------
 
+    /* Crea un desplegable con los departamentos de la BBDD. */
     function crearDesplegableDpto()
     {
         $conn = abrirConexion();
@@ -185,6 +215,7 @@
         cerrarConexion($conn);
     }
 
+    /* Crea un desplegable con los empleados de la BBDD. */
     function crearDesplegableEmple()
     {
         $conn = abrirConexion();
@@ -227,5 +258,21 @@
     function imprimirFinalDesplegable()
     {
         echo "</select>";
+    }
+    function imprimirDpto($cod_dpto)
+    {
+        echo "Empleados del departamento $cod_dpto ";
+    }
+    function imprimirInicioLista()
+    {
+        echo "</ul>";
+    }
+    function imprimirEmple($nombre)
+    {
+        echo "<li> $nombre </li>";
+    }
+    function imprimirFinLista()
+    {
+        echo "</ul>";
     }
 ?>

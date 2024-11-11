@@ -16,21 +16,21 @@
 ?>
 <BODY>
 
-    <form name='altaDpto' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        <label >DNI del empleado:</label> 
-            <?php crearDesplegableEmpleDpto() ?>
+    <form name='histoDpto' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
+    <label >Empleado </label>
+            <?php crearDesplegableEmple() ?>
         <br><br>
-        <label >Departamento del empleado:</label>
-            <?php crearDesplegableDpto() ?>
+        <label >Porcentaje variable: </label>
+            <input type='text' name='porcentaje' value='' size=5><br>
         <br><br>
-        <input type="submit" value="Dar de alta" name="alta">
+        <input type="submit" value="Comprobar" name="alta">
     </FORM>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
             $dni = substr(recogerDatos("DNI"),0,9);
-            $cod_dpto = substr(recogerDatos("cod_dpto"),0,4);
-            cambiarEmpleDpto($dni,$cod_dpto);
+            $porcentaje = recogerDatos("porcentaje");
+            cambiarSalar($dni,$porcentaje);
         }
     ?>
 

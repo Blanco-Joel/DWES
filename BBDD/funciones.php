@@ -32,8 +32,8 @@
 
             $stmt = $conn->prepare("INSERT INTO dpto (cod_dpto,nombre) values  (:cod_dpto,:nombre) ");
             $cod_dpto = sacarCodDpto($conn,"SELECT max(cod_dpto) FROM dpto");
-        
-            $cod_dpto = (substr($cod_dpto,0,-1) . (substr($cod_dpto,-1) + 1) );
+
+            $cod_dpto = substr($resultado, 0, 1) . str_pad((intval(substr($resultado, 1)) + 1), 3, '0', STR_PAD_LEFT);
 
             $stmt->bindParam(':cod_dpto', $cod_dpto  );
             $stmt->bindParam(':nombre', $nombre);
@@ -92,12 +92,12 @@
             $conn = abrirConexion();
             $fecha_ini = date('Y-m-d'); 
             $conn->beginTransaction();
-                $stmt = $conn->prepare("UPDATE emple_dpto SET fecha_fin = '$fecha_ini' WHERE dni = '$dni'");
+                $stmt = $conn->prepare("UPDATE emple_dpto SET fecha_fin = '$fecha_ini' WHERE dni = '$dni' AND fecha_fin IS NULL ");
                 $stmt->execute();
                 $stmt = $conn->prepare("INSERT INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
                 $stmt->execute();
-                mensajeEmple($dni,$cod_dpto);
             $conn->commit();
+                mensajeEmple($dni,$cod_dpto);
         }   
         catch(PDOException $e) {
             erroresBBDD($e->getMessage());
@@ -117,18 +117,59 @@
             imprimirDpto($cod_dpto);
             imprimirInicioLista();
             foreach ($resultado as $linea ) 
-            {
-                if(!empty($linea["nombre"]))
-                    imprimirEmple($linea["nombre"]);
-                else 
-                    imprimirEmple("Ningún trabajador está en este departamento.");
-            }   
+                imprimirEmple($linea["nombre"]);
+            if(empty($resultado))
+                imprimirEmple("Ningún trabajador está en este departamento.");
         }
         catch(PDOException $e) {
             erroresBBDD($e->getMessage());
         }
         cerrarConexion($conn);
         imprimirFinLista();
+    }
+    
+    function listarHistoricoDpto($cod_dpto)
+    {
+        try {
+            $conn = abrirConexion();
+            $stmt = $conn->prepare("SELECT emple.nombre FROM emple,emple_dpto WHERE emple.dni = emple_dpto.dni AND emple_dpto.cod_dpto = '$cod_dpto' AND fecha_fin IS NOT NULL");
+            $stmt->execute();
+            $resultado=$stmt->fetchAll();
+            imprimirDpto($cod_dpto);
+            imprimirInicioLista();
+            foreach ($resultado as $linea ) 
+                imprimirEmple($linea["nombre"]);
+            if(empty($resultado))
+                imprimirEmple("Ningún trabajador ha estado en este departamento.");
+        }
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+        cerrarConexion($conn);
+        imprimirFinLista();
+    }
+    
+    function cambiarSalar($dni,$porcentaje)
+    {
+        try {
+            $conn = abrirConexion();
+            $conn->beginTransaction();
+                $stmt = $conn->prepare("SELECT salario FROM emple WHERE dni = '$dni'");
+                $stmt->execute();
+                $resultado=$stmt->fetchAll();
+                foreach ($resultado as $linea ) 
+                    $salario = $linea["salario"];
+
+                $salario = $salario +($salario * floatval($porcentaje/100));
+                $stmt = $conn->prepare("UPDATE emple SET salario = $salario WHERE dni = '$dni'");
+                $stmt->execute();
+            $conn->commit();
+            mensajeSalar($dni);
+        }
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+        cerrarConexion($conn);
     }
 
 ?>
@@ -151,7 +192,7 @@
     mata el programa  */
     function erroresBBDD($error)
     {
-        if (substr($error,0,15) == "SQLSTATE[23000]") 
+        if (substr($error,48,5) == "1062") 
             trigger_error("No se puede repetir la clave primaria.");
         muerte();
     }
@@ -216,12 +257,28 @@
     }
 
     /* Crea un desplegable con los empleados de la BBDD. */
-    function crearDesplegableEmple()
+    function crearDesplegableEmpleDpto()
     {
         $conn = abrirConexion();
 
         imprimirInicioDesplegable("DNI");
         $stmt = $conn->prepare("SELECT concat( emple_dpto.dni,' | ',nombre,' | ', cod_dpto ) as DNI FROM emple,emple_dpto where emple.dni = emple_dpto.dni AND fecha_fin is NULL order by 1");
+        $stmt->execute();
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        $resultado=$stmt->fetchAll();
+        foreach($resultado as $linea) 
+            imprimirCuerpoDesplegable($linea["DNI"]);
+        imprimirFinalDesplegable();
+        cerrarConexion($conn);
+    }
+
+    /* Crea un desplegable con los empleados de la BBDD. */
+    function crearDesplegableEmple()
+    {
+        $conn = abrirConexion();
+
+        imprimirInicioDesplegable("DNI");
+        $stmt = $conn->prepare("SELECT concat( dni,' | ',nombre) as DNI FROM emple order by 1");
         $stmt->execute();
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $resultado=$stmt->fetchAll();
@@ -275,4 +332,9 @@
     {
         echo "</ul>";
     }
+    function mensajeSalar($dni)
+    {
+        echo "se ha actualizado el salario del empleado con dni $dni";
+    }
+
 ?>

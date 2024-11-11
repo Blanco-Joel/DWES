@@ -16,21 +16,17 @@
 ?>
 <BODY>
 
-    <form name='altaDpto' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        <label >DNI del empleado:</label> 
-            <?php crearDesplegableEmpleDpto() ?>
-        <br><br>
-        <label >Departamento del empleado:</label>
+    <form name='histoDpto' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
+        <label >Departamentos: </label>
             <?php crearDesplegableDpto() ?>
         <br><br>
-        <input type="submit" value="Dar de alta" name="alta">
+        <input type="submit" value="Comprobar" name="alta">
     </FORM>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
-            $dni = substr(recogerDatos("DNI"),0,9);
             $cod_dpto = substr(recogerDatos("cod_dpto"),0,4);
-            cambiarEmpleDpto($dni,$cod_dpto);
+            listarHistoricoDpto($cod_dpto);
         }
     ?>
 

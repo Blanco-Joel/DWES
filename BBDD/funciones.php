@@ -45,7 +45,7 @@
 
         }   
         catch(PDOException $e) {
-            echo "Error: " . $e->getMessage();
+            erroresBBDD($e->getMessage());
         }
 
         cerrarConexion($conn);
@@ -79,7 +79,7 @@
 
         }   
         catch(PDOException $e) {
-            trigger_error("Error: " . $e->getMessage());
+            erroresBBDD($e->getMessage());
         }
 
         cerrarConexion($conn);
@@ -87,21 +87,20 @@
 
     function cambiarEmpleDpto($dni,$cod_dpto)
     {
-        $conn = abrirConexion();
         try {
             $conn = abrirConexion();
             $fecha_ini = date('Y-m-d'); 
-            $stmt = $conn->prepare(" INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
-            $stmt->execute();
-            $stmt = $conn->prepare("INSERT INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
-            $stmt->execute();
-            
-        
-            mensajeEmple($dni,$cod_dpto);
-
+            $conn->beginTransaction();
+                $stmt = $conn->prepare("UPDATE emple_dpto SET fecha_fin = '$fecha_ini' WHERE dni = '$dni'");
+                $stmt->execute();
+                $stmt = $conn->prepare("INSERT INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
+                $stmt->execute();
+                mensajeEmple($dni,$cod_dpto);
+            $conn->commit();
         }   
         catch(PDOException $e) {
-            trigger_error("Error: " . $e->getMessage());
+            erroresBBDD($e->getMessage());
+            $conn->rollback();
         }
         cerrarConexion($conn);
 
@@ -116,13 +115,22 @@
     mata el programa  */
     function erroresDatos($nombre,$campo)
     {
-        $valido = true;
         if (empty($nombre)) {
             trigger_error("Introduzca un $campo.");
-            $valido = false;
+            muerte();
         }
-        if (!$valido) 
-            die;
+
+    }
+    function erroresBBDD($error)
+    {
+        if (substr($error,0,15) == "SQLSTATE[23000]") 
+            trigger_error("No se puede repetir la clave primaria.");
+        muerte();
+    }
+    /*Mata el programa.  */
+    function muerte()
+    {
+        die;
     }
 
 ?>
@@ -176,18 +184,18 @@
         imprimirFinalDesplegable();
         cerrarConexion($conn);
     }
+
     function crearDesplegableEmple()
     {
         $conn = abrirConexion();
 
         imprimirInicioDesplegable("DNI");
-        $stmt = $conn->prepare("SELECT concat( emple.dni,' | ',nombre,' | ', cod_dpto ) as DNI FROM emple,emple_dpto where emple.dni = emple_dpto.dni  order by 1");
+        $stmt = $conn->prepare("SELECT concat( emple_dpto.dni,' | ',nombre,' | ', cod_dpto ) as DNI FROM emple,emple_dpto where emple.dni = emple_dpto.dni AND fecha_fin is NULL order by 1");
         $stmt->execute();
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $resultado=$stmt->fetchAll();
         foreach($resultado as $linea) 
             imprimirCuerpoDesplegable($linea["DNI"]);
-
         imprimirFinalDesplegable();
         cerrarConexion($conn);
     }

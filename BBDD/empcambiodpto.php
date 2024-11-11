@@ -29,9 +29,8 @@
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
             $dni = substr(recogerDatos("DNI"),0,9);
-            var_dump($dni);
             $cod_dpto = substr(recogerDatos("cod_dpto"),0,4);
-            //cambiarEmpleDpto($dni,$cod_dpto);
+            cambiarEmpleDpto($dni,$cod_dpto);
         }
     ?>
 

@@ -29,9 +29,7 @@
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $usuario     = recogerDatos("usuario");
                 $contrasenia = recogerDatos("passw");
-                var_dump($contrasenia);
                 $comprobarDatos = busquedaBBDD($usuario,$contrasenia);
-                var_dump($comprobarDatos);
                 if (!empty($comprobarDatos))
                 {
                     hacerCoockie($usuario,$contrasenia);

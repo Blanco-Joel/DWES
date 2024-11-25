@@ -56,7 +56,6 @@
     /*Hace la consulta a la base de datos : abre la conexion con la BBDD, la hace y cierra la conexión. */
     function busquedaBBDD($dato1,$dato2)
     {
-          var_dump($dato1);
 
           try {
                $conn = abrirConexion();
@@ -129,7 +128,6 @@
     function recogerDatos($campo)
     {   
           $dato = limpiar($_POST[$campo]);
-          var_dump($dato);
           erroresDatos($dato, $campo);
           return $dato;
     }

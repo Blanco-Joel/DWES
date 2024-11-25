@@ -1,31 +1,27 @@
 <?php //COOKIES------------------------------------------------------------------------------------------------------------------
      
      //Llama a la funcion busquedaBBDD y definirCookie, compara dichos resultados y crea la cookie.
-     function hacerCoockie()
+     function hacerCoockie($dato1,$dato2)
      {    
-          
-          $resultado = busquedaBBDD();
 
-          $COOKIE_NAME  = limpiar($_POST["usuario"]);
-          $COOKIE_VALUE = limpiar($_POST["passw"]);
+          setcookie("USERPASS", $dato1 . "\\" . $dato2, time() + (86400 * 30), "/"); // 86400 segundos = 1 día
+          header("Location: ./menu.php");
           
-          foreach ($resultado as $datos ) {
-               if ($COOKIE_NAME == $datos["USUARIO"] && $COOKIE_VALUE == $datos["CONTRASENIA"]) {
-                    setcookie("USER", $COOKIE_NAME . "\\" . $COOKIE_VALUE, time() + (86400 * 30), "/"); // 86400 segundos = 1 día
-                    cambiarAcceso();
-                    header("Location: ./menu.php");
-               }
-          }
-          if(!isset($_COOKIE[$COOKIE_NAME])) {
-               mensajeFallo();
-          }
+
      }
+     //Comprueba la cookie en cada inicio de cada página.
+     function comprobarCookie()
+     {      
+          if(!isset($_COOKIE["USERPASS"])) {
+               header("Location: ./formulario.php");
+          }
 
+     }
      //Elimina la cookie.
      function borrarCookie()     
      {
-          if(isset($_COOKIE["USER"])) {
-               setcookie("USER", $COOKIE_NAME . "|" . $COOKIE_VALUE, (time() - 3600), "/"); // 86400 segundos = 1 día
+          if(isset($_COOKIE["USERPASS"])) {
+               setcookie("USERPASS", $dato1 . "|" . $dato2, (time() - 3600), "/"); // 86400 segundos = 1 día
                header("Location: ./formulario.php");
           }
      }
@@ -58,14 +54,15 @@
     }
 
     /*Hace la consulta a la base de datos : abre la conexion con la BBDD, la hace y cierra la conexión. */
-    function busquedaBBDD()
+    function busquedaBBDD($dato1,$dato2)
     {
+          var_dump($dato1);
+
           try {
                $conn = abrirConexion();
 
-               $select = $conn->prepare("SELECT USUARIO,CONTRASENIA FROM USUARIOS");
+               $select = $conn->prepare("SELECT USUARIO,CONTRASENIA FROM USUARIOS WHERE USUARIO = '$dato1' AND CONTRASENIA = '$dato2'");
                $conn->beginTransaction();
-                    $select = $conn->prepare("SELECT USUARIO,CONTRASENIA FROM USUARIOS");
                     $select->execute();
                $conn->commit();
                $resultado = $select->fetchAll();
@@ -79,13 +76,13 @@
     }
 
     //Cambia el ultimo acceso del usuario de la BBDD.
-    function cambiarAcceso()
+    function cambiarAcceso($dato1)
     {
           try {
                $conn = abrirConexion();
                $fecha = date('Y-m-d h:m:s');
                $conn->beginTransaction();
-                    $update = $conn->prepare("UPDATE USUARIOS SET ACCESO = '" . $fecha . "' WHERE USUARIO = '" .$COOKIE_NAME."'");
+                    $update = $conn->prepare("UPDATE USUARIOS SET ACCESO = '" . $fecha . "' WHERE USUARIO = '" .$dato1."'");
                     $update->execute();
                $conn->commit();
           }   
@@ -111,12 +108,31 @@
           muerte();
      }
 
+     //Tratamiento de errores en los campos a rellenar del usuario.
+     function erroresDatos($dato,$campo)
+     {
+          if (empty($dato))
+          {    
+               trigger_error("Introduzca un valor en el campo de " . $campo);
+               muerte();
+          }
+     }
+
      /*Mata el programa.*/
      function muerte()
      {
           die;
      }
 
+?>
+<?php //RECOGIDA DE DATOS ----------------------------------------------------------------------------------------------------------
+    function recogerDatos($campo)
+    {   
+          $dato = limpiar($_POST[$campo]);
+          var_dump($dato);
+          erroresDatos($dato, $campo);
+          return $dato;
+    }
 ?>
 <?php //LIMPIEZA -------------------------------------------------------------------------------------------------------------------
 

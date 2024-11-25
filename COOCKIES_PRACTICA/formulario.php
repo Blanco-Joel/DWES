@@ -1,5 +1,10 @@
 <?php
     include_once('./funciones.php');
+    
+?>
+<?php //INCLUSIÓN DE ERRORES-------------------------------------------------------------------------------------------------------
+    include_once "errores.php";
+    set_error_handler("error_function");
 ?>
 <HTML>
 
@@ -22,7 +27,18 @@
         </form>
         <?php
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                hacerCoockie();     
+                $usuario     = recogerDatos("usuario");
+                $contrasenia = recogerDatos("passw");
+                var_dump($contrasenia);
+                $comprobarDatos = busquedaBBDD($usuario,$contrasenia);
+                var_dump($comprobarDatos);
+                if (!empty($comprobarDatos))
+                {
+                    hacerCoockie($usuario,$contrasenia);
+                    cambiarAcceso($usuario);
+                }elseif(!isset($_COOKIE["USERPASS"])) {
+                    mensajeFallo();
+                }
             }
             ?>
     </body>

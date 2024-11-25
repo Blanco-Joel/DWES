@@ -1,7 +1,12 @@
 <?php
     include_once('./funciones.php');
-
-?><HTML>
+    comprobarCookie();
+?>
+<?php //INCLUSIÓN DE ERRORES-------------------------------------------------------------------------------------------------------
+    include_once "errores.php";
+    set_error_handler("error_function");
+?>
+<HTML>
 
 <HEAD> 
  <meta charset="UTF-8">

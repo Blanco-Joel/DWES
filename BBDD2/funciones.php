@@ -32,14 +32,13 @@
 
             $id_cat = $conn->query("SELECT IFNULL(CONCAT('C00',CAST(SUBSTR(MAX(ID_CATEGORIA), 2) AS UNSIGNED) + 1),'C001') as COD FROM CATEGORIA ");
             $id_cat=$id_cat->fetchColumn();
-            $stmt = $conn->prepare("INSERT INTO categoria (id_categoria,nombre) values  (:id_cat,:nombre) ");
+            $conn->beginTransaction();
+                $stmt = $conn->prepare("INSERT INTO categoria (id_categoria,nombre) values  (:id_cat,:nombre) ");
+                $stmt->bindParam(':id_cat', $id_cat  );
+                $stmt->bindParam(':nombre', $nombre);
+                $stmt->execute();
+            $conn->commit();
 
-
-            $stmt->bindParam(':id_cat', $id_cat  );
-            $stmt->bindParam(':nombre', $nombre);
-            $stmt->execute();
-            $stmt->setFetchMode(PDO::FETCH_ASSOC);
-        
             mensajeCat ($nombre,$id_cat);
 
 
@@ -58,14 +57,15 @@
             $conn = abrirConexion();
             $id_categoria = substr($id_categoria,0,4);
             $id_prod = $conn->query("SELECT IFNULL(CONCAT('P00',CAST(SUBSTR(MAX(ID_PRODUCTO), 2) AS UNSIGNED) + 1),'P001') as COD FROM PRODUCTO");
-            $id_prod = $id_cat->fetchColumn();
-            $stmt = $conn->prepare("INSERT INTO Producto (nombre,precio,) values  ('$nombre','$ape','$dni','$salario','$fecha_nac') ");
-            $stmt->execute();
-            $stmt = $conn->prepare("INSERT INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
-            $stmt->execute();
-            
+            $id_prod = $id_prod->fetchColumn();
+
+            $conn->beginTransaction();
+                $stmt = $conn->prepare("INSERT INTO Producto (id_producto,nombre,precio,id_categoria) values  ('$id_prod','$nombre','$precio','$id_categoria') ");
+                $stmt->execute();
+            $conn->commit();
+
         
-            mensajeProd($dni,$cod_dpto);
+            mensajeProd($nombre,$id_prod,$id_categoria);
 
         }   
         catch(PDOException $e) {
@@ -74,93 +74,53 @@
 
         cerrarConexion($conn);
     }
-
-    /*Recibe los datos a cambiar en la tabla emple_dpto, abre la conexion con la BBDD y lo modifica. */
-    function cambiarEmpleDpto($dni,$cod_dpto)
+    /*Recibe los datos a introducir en la tabla producto, abre la conexion con la BBDD y lo introduce  . */
+    function introducirAlm($localidad)
     {
         try {
             $conn = abrirConexion();
-            $fecha_ini = date('Y-m-d'); 
             $conn->beginTransaction();
-                $stmt = $conn->prepare("UPDATE emple_dpto SET fecha_fin = '$fecha_ini' WHERE dni = '$dni' AND fecha_fin IS NULL ");
-                $stmt->execute();
-                $stmt = $conn->prepare("INSERT INTO emple_dpto (dni,cod_dpto,fecha_ini) values  ('$dni','$cod_dpto','$fecha_ini') ");
+                $stmt = $conn->prepare("INSERT INTO Almacen (localidad) values  ('$localidad')");
                 $stmt->execute();
             $conn->commit();
-                mensajeEmple($dni,$cod_dpto);
+
+        
+            mensajeAlm($localidad);
+
         }   
         catch(PDOException $e) {
             erroresBBDD($e->getMessage());
-            $conn->rollback();
         }
-        cerrarConexion($conn);
 
-    }
-
-    function listarEmplesDpto($cod_dpto)
-    {
-        try {
-            $conn = abrirConexion();
-            $stmt = $conn->prepare("SELECT emple.nombre FROM emple,emple_dpto WHERE emple.dni = emple_dpto.dni AND emple_dpto.cod_dpto = '$cod_dpto' AND fecha_fin IS NULL");
-            $stmt->execute();
-            $resultado=$stmt->fetchAll();
-            imprimirDpto($cod_dpto);
-            imprimirInicioLista();
-            foreach ($resultado as $linea ) 
-                imprimirEmple($linea["nombre"]);
-            if(empty($resultado))
-                imprimirEmple("Ningún trabajador está en este departamento.");
-        }
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
         cerrarConexion($conn);
-        imprimirFinLista();
     }
-    
-    function listarHistoricoDpto($cod_dpto)
+    function introducirCantProd($id_prod,$localidad,$cantidad)
     {
         try {
             $conn = abrirConexion();
-            $stmt = $conn->prepare("SELECT emple.nombre FROM emple,emple_dpto WHERE emple.dni = emple_dpto.dni AND emple_dpto.cod_dpto = '$cod_dpto' AND fecha_fin IS NOT NULL");
+            $stmt = $conn->prepare("SELECT num_almacen FROM almacen where localidad = '$localidad'");
             $stmt->execute();
-            $resultado=$stmt->fetchAll();
-            imprimirDpto($cod_dpto);
-            imprimirInicioLista();
-            foreach ($resultado as $linea ) 
-                imprimirEmple($linea["nombre"]);
-            if(empty($resultado))
-                imprimirEmple("Ningún trabajador ha estado en este departamento.");
-        }
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-        cerrarConexion($conn);
-        imprimirFinLista();
-    }
-    
-    function cambiarSalar($dni,$porcentaje)
-    {
-        try {
-            $conn = abrirConexion();
+            $stmt->setFetchMode(PDO::FETCH_NUM);
+            $num_almacen=$stmt->fetchAll();
+            $num_almacen= $num_almacen[0];
+            $id_producto = substr($id_prod,0,4);
             $conn->beginTransaction();
-                $stmt = $conn->prepare("SELECT salario FROM emple WHERE dni = '$dni'");
-                $stmt->execute();
-                $resultado=$stmt->fetchAll();
-                foreach ($resultado as $linea ) 
-                    $salario = $linea["salario"];
-
-                $salario = $salario +($salario * floatval($porcentaje/100));
-                $stmt = $conn->prepare("UPDATE emple SET salario = $salario WHERE dni = '$dni'");
+                $stmt = $conn->prepare("INSERT INTO Almacena (num_almacen,id_producto,cantidad) values  ('$num_almacen[0]','$id_producto','$cantidad')");
                 $stmt->execute();
             $conn->commit();
-            mensajeSalar($dni);
-        }
+
+            $id_prod = substr($id_prod,7);
+            mensajeCantProd($localidad,$id_prod,$cantidad);
+
+        }   
         catch(PDOException $e) {
             erroresBBDD($e->getMessage());
         }
+
         cerrarConexion($conn);
     }
+    
+
 
 ?>
 
@@ -245,58 +205,63 @@
         imprimirFinalDesplegable();
         cerrarConexion($conn);
     }
-
-    /* Crea un desplegable con los empleados de la BBDD. */
-    function crearDesplegableEmpleDpto()
+    function crearDesplegableProd()
     {
         $conn = abrirConexion();
 
-        imprimirInicioDesplegable("DNI");
-        $stmt = $conn->prepare("SELECT concat( emple_dpto.dni,' | ',nombre,' | ', cod_dpto ) as DNI FROM emple,emple_dpto where emple.dni = emple_dpto.dni AND fecha_fin is NULL order by 1");
+        imprimirInicioDesplegable("id_producto");
+        $stmt = $conn->prepare("SELECT concat(id_producto, ' | ', nombre) as prod FROM producto order by prod");
         $stmt->execute();
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $resultado=$stmt->fetchAll();
         foreach($resultado as $linea) 
-            imprimirCuerpoDesplegable($linea["DNI"]);
+            imprimirCuerpoDesplegable($linea["prod"]);
+
         imprimirFinalDesplegable();
         cerrarConexion($conn);
     }
-
-    /* Crea un desplegable con los empleados de la BBDD. */
-    function crearDesplegableEmple()
+    function crearDesplegableAlm()
     {
         $conn = abrirConexion();
 
-        imprimirInicioDesplegable("DNI");
-        $stmt = $conn->prepare("SELECT concat( dni,' | ',nombre) as DNI FROM emple order by 1");
+        imprimirInicioDesplegable("localidad");
+        $stmt = $conn->prepare("SELECT localidad FROM almacen order by localidad");
         $stmt->execute();
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $resultado=$stmt->fetchAll();
         foreach($resultado as $linea) 
-            imprimirCuerpoDesplegable($linea["DNI"]);
+            imprimirCuerpoDesplegable($linea["localidad"]);
+
         imprimirFinalDesplegable();
         cerrarConexion($conn);
     }
+
+
 ?>
 
 
 <?php //IMPRESIÓN------------------------------------------------------------------------------------------------------------------
     
-    /*Recibe el nombre y el codigo del departamento e imprimie por patalla un mensaje una vez se 
-    haya introducido el mismo. */
-    function mensajeCat($nombre,$cod_dpto)
+    function mensajeCat($nombre,$id_cat)
     {
-        echo "Se ha introducido la Categoria $nombre con el codigo $cod_dpto";
+        echo "Se ha introducido la Categoria $nombre con el codigo $id_cat";
     }
-    function mensajeEmple($dni,$cod_dpto)
+    function mensajeProd($nombre,$id_prod,$id_categoria)
     {
-        echo "Se ha introducido el empleado con el DNI $dni en el departamento $cod_dpto ";
+        echo "Se ha introducido el producto $nombre con el codigo $id_prod en la categoria con código $id_categoria ";
     }
-    function imprimirInicioDesplegable($name)
+    function mensajeAlm($localidad)
     {
-        echo "<select name=\"" . $name . "\">";
+        echo "Se ha introducido el almacen de la localidad $localidad ";
     }
-
+    function mensajeCantProd($localidad,$id_producto,$cantidad)
+    {
+        echo "Se han introducido $cantidad del producto $id_producto en el almacen de la localidad $localidad ";
+    }
+    function imprimirInicioDesplegable($dato)
+    {
+        echo "<select name='$dato'>";
+    }
     function imprimirCuerpoDesplegable($dato)
     {
         echo "<option value=\"" . $dato . "\">". $dato ."</option>";

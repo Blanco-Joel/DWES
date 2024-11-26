@@ -16,21 +16,15 @@
 ?>
 <BODY>
 
-    <form name='altaPro' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        <label >Nombre del producto:</label> <input type='text' name='nombre' value='' size=40><br>
-        <label >Precio del producto:</label> <input type='text' name='precio' value='' size=8><br>
-        <label >Categoria del producto:</label>
-            <?php crearDesplegableCat() ?>
-        <br><br>
+    <form name='altaAlm' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
+        Localidad del almacén: <input type='text' name='localidad' value='' size=5><br>
         <input type="submit" value="Dar de alta" name="alta">
     </FORM>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
-            $nombre = recogerDatos("nombre");
-            $precio = recogerDatos("precio");
-            $id_categoria = recogerDatos("id_categoria");
-            introducirProd($nombre,$precio,$id_categoria);
+            $localidad = recogerDatos("localidad");
+            introducirAlm($localidad);
         }
     ?>
 

@@ -74,7 +74,7 @@
 
         cerrarConexion($conn);
     }
-    /*Recibe los datos a introducir en la tabla producto, abre la conexion con la BBDD y lo introduce  . */
+    /*Recibe los datos a introducir en la tabla almacen, abre la conexion con la BBDD y lo introduce  . */
     function introducirAlm($localidad)
     {
         try {
@@ -94,6 +94,8 @@
 
         cerrarConexion($conn);
     }
+    
+    /*Recibe los datos a introducir en la tabla almacena, abre la conexion con la BBDD y lo introduce  . */
     function introducirCantProd($id_prod,$localidad,$cantidad)
     {
         try {
@@ -119,8 +121,115 @@
 
         cerrarConexion($conn);
     }
-    
+    /*Recibe el nombre y el id del productoa listar de la tabla almacena, abre la conexion con la BBDD y lo imprime  . */
+    function listarCantProd($id_producto)
+    {
+        try {
+            $id_prod = substr($id_producto,0,4);
+            $id_producto = substr($id_producto,7);
+            $conn = abrirConexion();
+            $stmt = $conn->prepare("SELECT concat(cantidad,'|',localidad) as resultado FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and id_producto = '$id_prod'");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $resultado = $stmt->fetchAll();
+            foreach ($resultado as $almacen => $linea) {
+                $cantidad = explode("|",$linea['resultado']);
+                imprimirCantidades($cantidad[0],$cantidad[1],$id_producto);
+            }
 
+        }   
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+
+        cerrarConexion($conn);
+    }
+    /*Recibe el nombre y el id del productoa listar de la tabla almacena, abre la conexion con la BBDD y lo imprime  . */
+    function listarProdAlm($localidad)
+    {
+        try {
+            $conn = abrirConexion();
+            $stmt = $conn->prepare("SELECT concat(cantidad,'|',nombre) as resultado FROM almacena,producto,almacen where almacen.num_almacen = almacena.num_almacen and almacena.id_producto = producto.id_producto and localidad = '$localidad' ");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $resultado = $stmt->fetchAll();
+            foreach ($resultado as $almacen => $linea) {
+                $cantidad = explode("|",$linea['resultado']);
+                imprimirCantidades($cantidad[0],$localidad,$cantidad[1]);
+            }
+
+        }   
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+
+        cerrarConexion($conn);
+    }
+    /*Recibe los datos a introducir en la tabla cliente, abre la conexion con la BBDD y lo introduce  . */
+    function introducirCliente($nif)
+    {
+        try {
+            $conn = abrirConexion();
+            $conn->beginTransaction();
+                $stmt = $conn->prepare("INSERT INTO Cliente (NIF) values  ('$nif')");
+                $stmt->execute();
+            $conn->commit();
+
+        
+            mensajeCliente($nif);
+
+        }   
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+
+        cerrarConexion($conn);
+    }
+    /*Recibe los datos para la compra, abre la conexion con la BBDD y la hace. */
+    function realizarCompra($nif,$id_prod,$localidad,$cantidadCompra)
+    {
+        try {
+            $conn = abrirConexion();
+            $id_producto = substr($id_prod,0,4);
+            $stmt = $conn->prepare("SELECT cantidad FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and localidad = '$localidad' and id_producto = '$id_producto'");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $cantidad=$stmt->fetchAll();
+            $cantidad = $cantidad[0]['cantidad'];
+
+            $stmt = $conn->prepare("SELECT  nif FROM cliente where nif = '$nif'");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $existe=$stmt->fetchAll();
+            var_dump($existe);
+
+            $fecha_compra = date("Y-m-d");
+            if (empty($existe)) {
+                mensajeErrorCliente($nif);
+            }else
+                if ($cantidad > $cantidadCompra) {
+                    $conn->beginTransaction();
+                        $stmt = $conn->prepare("INSERT INTO compra (nif,id_producto,fecha_compra,unidades) values  ('$nif','$id_producto','$fecha_compra','$cantidadCompra')");
+                        $stmt->execute();
+                        $stmt = $conn->prepare("UPDATE ALMACENA SET CANTIDAD = $cantidad-$cantidadCompra where id_producto = '$id_producto'");
+                        $stmt->execute();
+
+                    $conn->commit();
+                } else 
+                    mensajeNoCompra($id_producto,$localidad,$cantidad,$cantidadCompra);
+                
+
+
+            $id_prod = substr($id_prod,7);
+            mensajeCantProd($localidad,$id_prod,$cantidad);
+
+        }   
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+
+        cerrarConexion($conn);
+    }
 
 ?>
 
@@ -137,7 +246,15 @@
         }
 
     }
+    //Tratamiento de excepcion del campo NIF.
+    function comprobarNIF($nif)
+    {
+        if (!(preg_match("/^[0-9]{8}[a-z]{1}$/i", $nif))) {
+            trigger_error("Introduzca un nif con el formato adecuado [00000000A].");
+            muerte();
+        }
 
+    }
     /*Tratamiento de excepciones recibiendo los el error de la consulta de la BBDD. En caso de fallo
     mata el programa  */
     function erroresBBDD($error)
@@ -164,7 +281,8 @@
     {   
         $dato = limpiar($_POST["$campo"]);
         erroresDatos($dato,$campo);
-       
+        if ($campo == "NIF")
+            comprobarNIF($dato);
         return $dato;
     }
 
@@ -256,7 +374,23 @@
     }
     function mensajeCantProd($localidad,$id_producto,$cantidad)
     {
-        echo "Se han introducido $cantidad del producto $id_producto en el almacen de la localidad $localidad ";
+        echo "Se han introducido $cantidad unidades del producto $id_producto en el almacen de la localidad $localidad ";
+    }
+    function  imprimirCantidades($cantidad,$localidad,$id_producto)
+    {
+        echo "En el almacen de $localidad hay $cantidad unidades del producto $id_producto.<br>";
+    }
+    function mensajeCliente($nif)
+    {
+        echo "Se ha introducido cliente con NIF : $nif ";
+    }
+    function mensajeNoCompra($id_producto,$localidad,$cantidad,$cantidadCompra)
+    {
+        echo "No se ha podido realizar la compra del producto $id_producto, ya que el almacen de $localidad tiene $cantidad unidades y la compra es de $cantidadCompra ";
+    }
+    function mensajeErrorCliente($nif)
+    {
+        echo "No se ha podido realizar la compra del producto, ya que el cliente con NIF $nif no está registrado. ";
     }
     function imprimirInicioDesplegable($dato)
     {

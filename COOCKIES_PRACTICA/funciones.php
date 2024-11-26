@@ -4,7 +4,7 @@
      function hacerCoockie($dato1,$dato2)
      {    
 
-          setcookie("USERPASS", $dato1 . "\\" . $dato2, time() + (86400 * 30), "/"); // 86400 segundos = 1 día
+          setcookie("USERPASS", $dato1 . "|" . $dato2, time() + (86400 * 30), "/"); // 86400 segundos = 1 día
           header("Location: ./menu.php");
           
 

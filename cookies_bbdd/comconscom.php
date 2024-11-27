@@ -17,16 +17,24 @@
 <BODY>
 
     <form name='altaCat' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        <label >Nombre del producto:</label>
-            <?php crearDesplegable("id_producto, ' | ', nombre","producto","id_producto") ?>
+        
+        <label >NIF del cliente</label>
+        <?php crearDesplegable("nif","cliente","NIF") ?>
         <br><br>
-        <input type="submit" value="Validar" name="alta">
+
+        Priemra Fecha[AAAA-MM-DD]: <input type='text' name='ini' value='' size=15><br><br>
+        Segunda Fecha[AAAA-MM-DD]: <input type='text' name='fin' value='' size=15><br><br>
+        
+
+        <input type="submit" value="Comprobar" name="alta">
     </FORM>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
-            $id_producto = recogerDatos("id_producto");
-            listarCantProd($id_producto);
+            $NIF = recogerDatos("NIF");
+            $fecha_inicio = recogerDatos("ini");
+            $fecha_final = recogerDatos("fin");
+            comprobarCompras($NIF,$fecha_inicio,$fecha_final);
         }
     ?>
 

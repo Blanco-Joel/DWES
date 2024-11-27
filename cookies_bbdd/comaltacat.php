@@ -17,16 +17,14 @@
 <BODY>
 
     <form name='altaCat' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        <label >Nombre del producto:</label>
-            <?php crearDesplegable("id_producto, ' | ', nombre","producto","id_producto") ?>
-        <br><br>
-        <input type="submit" value="Validar" name="alta">
+        Nombre de la categoria: <input type='text' name='nombre' value='' size=5><br>
+        <input type="submit" value="Dar de alta" name="alta">
     </FORM>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
-            $id_producto = recogerDatos("id_producto");
-            listarCantProd($id_producto);
+            $nombre = recogerDatos("nombre");
+            introducirCat($nombre);
         }
     ?>
 

@@ -21,7 +21,7 @@
             <?php crearDesplegable("id_producto, ' | ', nombre","producto","id_producto")  ?>
         <br><br>
         <label >Localidad del Almacen:</label>
-            <?php crearDesplegable("localidad","almacen","localidad") ?>
+            <?php crearDesplegable("num_almacen","almacen","num_almacen") ?>
         <br><br>
         Cantidad del producto: <input type='text' name='cantidad' value='' size=5><br>
         <input type="submit" value="Validar" name="alta">
@@ -30,7 +30,7 @@
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
             $id_producto = recogerDatos("id_producto");
-            $localidad = recogerDatos("localidad");
+            $localidad = recogerDatos("num_almacen");
             $cantidad = recogerDatos("cantidad");
             introducirCantProd($id_producto,$localidad,$cantidad);
         }

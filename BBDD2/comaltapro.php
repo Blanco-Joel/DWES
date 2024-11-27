@@ -20,7 +20,7 @@
         <label >Nombre del producto:</label> <input type='text' name='nombre' value='' size=40><br>
         <label >Precio del producto:</label> <input type='text' name='precio' value='' size=8><br>
         <label >Categoria del producto:</label>
-            <?php crearDesplegableCat("id_categoria,' | ', nombre","categoria","id_categoria") ?>
+            <?php crearDesplegable("id_categoria,' | ', nombre","categoria","id_categoria") ?>
         <br><br>
         <input type="submit" value="Dar de alta" name="alta">
     </FORM>

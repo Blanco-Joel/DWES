@@ -96,23 +96,32 @@
     }
     
     /*Recibe los datos a introducir en la tabla almacena, abre la conexion con la BBDD y lo introduce  . */
-    function introducirCantProd($id_prod,$localidad,$cantidad)
+    function introducirCantProd($id_prod,$num_almacen,$cantidad)
     {
         try {
             $conn = abrirConexion();
-            $stmt = $conn->prepare("SELECT num_almacen FROM almacen where localidad = '$localidad'");
-            $stmt->execute();
-            $stmt->setFetchMode(PDO::FETCH_NUM);
-            $num_almacen=$stmt->fetchAll();
-            $num_almacen= $num_almacen[0];
             $id_producto = substr($id_prod,0,4);
-            $conn->beginTransaction();
-                $stmt = $conn->prepare("INSERT INTO Almacena (num_almacen,id_producto,cantidad) values  ('$num_almacen[0]','$id_producto','$cantidad')");
-                $stmt->execute();
-            $conn->commit();
+            $stmt = $conn->prepare("SELECT id_producto from producto where id_producto = '$id_producto' ");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $resultado = $stmt->fetchAll();
+            if (!empty($resultado)) 
+            {
+                $conn->beginTransaction();
+                    $stmt = $conn->prepare("INSERT INTO Almacena (num_almacen,id_producto,cantidad) values  ('$num_almacen','$id_producto','$cantidad')");
+                    $stmt->execute();
+                $conn->commit();
+            }
+            else 
+            {
+                $conn->beginTransaction();
+                    $stmt = $conn->prepare("UPDATE Almacena set cantidad = cantidad + $cantidad where  id_producto = '$id_producto'");
+                    $stmt->execute();
+                $conn->commit();
+            }
 
             $id_prod = substr($id_prod,7);
-            mensajeCantProd($localidad,$id_prod,$cantidad);
+            mensajeCantProd($num_almacen,$id_prod,$cantidad);
 
         }   
         catch(PDOException $e) {
@@ -128,7 +137,7 @@
             $id_prod = substr($id_producto,0,4);
             $id_producto = substr($id_producto,7);
             $conn = abrirConexion();
-            $stmt = $conn->prepare("SELECT concat(cantidad,'|',localidad) as resultado FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and id_producto = '$id_prod'");
+            $stmt = $conn->prepare("SELECT concat(cantidad,'|',num_almacen) as resultado FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and id_producto = '$id_prod'");
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $resultado = $stmt->fetchAll();
@@ -145,17 +154,17 @@
         cerrarConexion($conn);
     }
     /*Recibe el nombre y el id del productoa listar de la tabla almacena, abre la conexion con la BBDD y lo imprime  . */
-    function listarProdAlm($localidad)
+    function listarProdAlm($num_almacen)
     {
         try {
             $conn = abrirConexion();
-            $stmt = $conn->prepare("SELECT concat(cantidad,'|',nombre) as resultado FROM almacena,producto,almacen where almacen.num_almacen = almacena.num_almacen and almacena.id_producto = producto.id_producto and localidad = '$localidad' ");
+            $stmt = $conn->prepare("SELECT concat(cantidad,'|',nombre) as resultado FROM almacena,producto,almacen where almacen.num_almacen = almacena.num_almacen and almacena.id_producto = producto.id_producto ");
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $resultado = $stmt->fetchAll();
             foreach ($resultado as $almacen => $linea) {
                 $cantidad = explode("|",$linea['resultado']);
-                imprimirCantidades($cantidad[0],$localidad,$cantidad[1]);
+                imprimirCantidades($cantidad[0],$num_almacen,$cantidad[1]);
             }
 
         }   

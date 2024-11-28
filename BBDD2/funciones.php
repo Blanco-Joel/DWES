@@ -245,8 +245,7 @@
     {
         try {
             $conn = abrirConexion();
-            $fecha_final = substr($fecha_final,0,9). strval(substr($fecha_final,-1)+1 );
-            $stmt = $conn->prepare(" SELECT producto.id_producto, producto.nombre, (precio*unidades) FROM compra,producto WHERE producto.id_producto = compra.id_producto and fecha_compra >= '$fecha_inicio' AND fecha_compra < '$fecha_final' AND nif = '$NIF'");
+            $stmt = $conn->prepare(" SELECT producto.id_producto, producto.nombre, (precio*unidades) FROM compra,producto WHERE producto.id_producto = compra.id_producto and fecha_compra >= concat('$fecha_inicio',' 00:00:00') AND fecha_compra <= concat('$fecha_final',' 23:59:59')  AND nif = '$NIF'");
             
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);

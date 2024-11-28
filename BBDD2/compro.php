@@ -19,7 +19,7 @@
     <form name='altaCat' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
         NIF del cliente[00000000A]: <input type='text' name='NIF' value='' size=5><br><br>
         
-        <label >Localidad del almacen:</label>
+        <label >Número del almacen:</label>
             <?php crearDesplegable("localidad","almacen","localidad")?>
         <br><br>
         

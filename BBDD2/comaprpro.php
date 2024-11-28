@@ -20,7 +20,7 @@
         <label >Nombre del producto:</label>
             <?php crearDesplegable("id_producto, ' | ', nombre","producto","id_producto")  ?>
         <br><br>
-        <label >Localidad del Almacen:</label>
+        <label >Número del Almacen:</label>
             <?php crearDesplegable("num_almacen","almacen","num_almacen") ?>
         <br><br>
         Cantidad del producto: <input type='text' name='cantidad' value='' size=5><br>

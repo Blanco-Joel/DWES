@@ -20,7 +20,7 @@
         <h1>MENÚ</h1>
         <ul>
             <li>
-                <a href="./pag2.php">Página 2 </a>
+                <a href="./comprocli.php">Realizar Compra </a>
             </li>
             <li>
                 <a href="./comconscli.php">Comprobar Compras </a>

@@ -18,27 +18,49 @@
 
 <BODY>
 
-    <form name='altaCat' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        
-        <label >Número del almacen:</label>
-            <?php crearDesplegable("num_almacen","almacen","num_almacen")?>
-        <br><br>
+    <form name='comprar' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
         
         <label >Nombre del producto:</label>
-            <?php crearDesplegable("id_producto, ' | ', nombre","producto","id_producto")  ?>
+            <?php crearDesplegable("nombre","producto","nombre")  ?>
         <br><br>
-        Cantidad del producto: <input type='text' name='cantidad' value='' size=5><br>
 
-        <input type="submit" value="Comprar" name="alta">
-    </FORM>
+        Cantidad del producto: <input type='text' name='cantidad' value='' size=5><br><br>
+
+        <input type="submit" value="Añadir Producto" name="annadirProd">
+        <br><br>
+        <input type="submit" value="Comprar Cesta" name="comprarCest">
+        <br><br>
+        <input type="submit" value="Eliminar Cesta" name="borrarCest">
+        <br><br>
+        <input type="submit" value="Cerrar Sesion" name="cerrarSes">   
+        <br><br><br>
+
+        <?php imprimirInicioCesta(); ?>
+    </form>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
-            $id_producto = recogerDatos("id_producto");
-            $num_almacen = recogerDatos("num_almacen");
-            $cantidad = recogerDatos("cantidad");
-            $NIF = buscarNif();
-            realizarCompra($NIF,$id_producto,$num_almacen,$cantidad);
+            if(isset($_POST['annadirProd']))
+            {
+                $nombre = recogerDatos("nombre");
+                $cantidad = recogerDatos("cantidad");
+                $num_almacen = comprobarAlmacen($nombre,$cantidad);
+                $NIF = $_COOKIE["USERPASS"];
+                annadirProductoCesta($NIF,$nombre,$cantidad,$num_almacen);
+            }
+            if (isset($_POST['comprarCest'])) {
+                $NIF = $_COOKIE["USERPASS"];
+                realizarCompraFinal($NIF);
+                boorarCesta();
+            }
+            if (isset($_POST['borrarCest'])) 
+                boorarCesta();
+                 
+            if (isset($_POST['cerrarSes'])) 
+             {
+                borrarCookie();     
+                boorarCesta();}
+
         }
     ?>
 

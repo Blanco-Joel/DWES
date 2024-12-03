@@ -9,17 +9,14 @@
 <?php //COOKIES------------------------------------------------------------------------------------------------------------------
      
     //Llama a la funcion busquedaBBDD y definirCookie, compara dichos resultados y crea la cookie.
-    function hacerCoockie($dato1,$dato2)
+    function hacerCoockie($nif)
     {    
-
-        setcookie("USERPASS", $dato1 . "|" . $dato2, time() + (86400 * 30), "/"); // 86400 segundos = 1 día
+        setcookie("USERPASS", $nif, time() + (86400 * 30), "/"); // 86400 segundos = 1 día
         header("Location: ./menu.php");
-        
-
     }
     //Comprueba la cookie en cada inicio de cada página.
     function comprobarCookie()
-    {      
+    {    
         if(!isset($_COOKIE["USERPASS"])) {
             header("Location: ./comlogincli.php");
         }
@@ -29,15 +26,23 @@
     function borrarCookie()     
     {
         if(isset($_COOKIE["USERPASS"])) {
-            setcookie("USERPASS", $dato1 . "|" . $dato2, (time() - 3600), "/"); // 86400 segundos = 1 día
+            setcookie("USERPASS", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
             header("Location: ./comlogincli.php");
         }
+
     }
-    function dividirCookie($nombreCookie)
+    function hacerCookieCesta($linea)
+    {   
+        setcookie("cesta",$linea, time() + (86400 * 30), "/");
+
+    }
+    function boorarCesta()
     {
-        $cookie = explode("|",$_COOKIE[$nombreCookie]);
-        return $cookie;
+        if (isset($_COOKIE["cesta"])) {
+            setcookie("cesta","0", (time() - 3600), "/");
+        }
     }
+
 ?>
 
 
@@ -230,13 +235,13 @@
     }
 
     /*Recibe los datos para la compra(nif,id_prod,localidad,cantidadCompra), abre la conexion con la BBDD y la hace. */
-    function realizarCompra($nif,$id_prod,$localidad,$cantidadCompra)
+    function realizarCompra($nif,$id_prod,$num_almacen,$cantidadCompra)
     {
         try {
             $conn = abrirConexion();
             $id_producto = substr($id_prod,0,4);
             $id_prod = substr($id_prod,7);
-            $stmt = $conn->prepare("SELECT cantidad FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and localidad = '$localidad' and id_producto = '$id_producto'");
+            $stmt = $conn->prepare("SELECT cantidad FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and num_almacen = '$num_almacen' and id_producto = '$id_producto'");
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $cantidad=$stmt->fetchAll();
@@ -280,13 +285,19 @@
         try {
             $conn = abrirConexion();
             $stmt = $conn->prepare(" SELECT producto.id_producto, producto.nombre, (precio*unidades) FROM compra,producto WHERE producto.id_producto = compra.id_producto and fecha_compra >= concat('$fecha_inicio',' 00:00:00') AND fecha_compra <= concat('$fecha_final',' 23:59:59')  AND nif = '$NIF'");
-            
+            $precioTotal = 0;
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $resultado = $stmt->fetchAll();
             if(!empty($resultado))
+            {
                 foreach ($resultado as $almacen => $linea) 
+                {
                     imprirmirListaCompras($linea['id_producto'], $linea['nombre'], $linea['(precio*unidades)']);
+                    $precioTotal += $linea['(precio*unidades)']; 
+                }
+                imprimirMontanteFinal($precioTotal);
+            }
             else
                 mensajeNoHaComprado();
 
@@ -334,17 +345,14 @@
         catch(PDOException $e) {
             erroresBBDD($e->getMessage());
         }
-        
         cerrarConexion($conn);
         return $resultado;
     }
 
-    function buscarNif()
+    function buscarNif($nombre)
     {
         try {
             $conn = abrirConexion();
-            $cookie = dividirCookie("USERPASS");
-            $nombre = $cookie[0];
             $select = $conn->prepare("SELECT nif FROM cliente WHERE nombre = '$nombre'");
             $select->execute();
             $select->setFetchMode(PDO::FETCH_ASSOC);
@@ -357,8 +365,124 @@
 
         cerrarConexion($conn);
         return $nif;
-
     }
+
+    function comprobarAlmacen($nombre,$cantidad)
+    {
+        try {
+            $conn = abrirConexion();
+            $select = $conn->prepare("SELECT almacen.num_almacen  FROM almacen,almacena,producto WHERE producto.id_producto = almacena.id_producto AND almacen.num_almacen = almacena.num_almacen AND producto.nombre = '$nombre' AND cantidad >= '$cantidad'");
+            $select->execute();
+            $select->setFetchMode(PDO::FETCH_ASSOC);
+            $resultado = $select->fetchAll();
+            $num_almacen = (!empty($resultado)) ? $resultado[0]['num_almacen'] : 0 ;
+        }   
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+
+        cerrarConexion($conn);
+        return $num_almacen;
+    }
+
+    function annadirProductoCesta($nif,$nombre,$cantidad,$num_almacen)
+    {
+        if ($num_almacen != 0 )
+        {
+            try {
+
+                $conn = abrirConexion();
+
+                $stmt = $conn->prepare("SELECT id_producto FROM producto where nombre = '$nombre'");
+                $stmt->execute();
+                $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                $id_producto=$stmt->fetchAll();
+                $id_producto = $id_producto[0]["id_producto"];
+                $encontrado = true;
+                if (isset($_COOKIE["cesta"])) 
+                {
+                    $linea = $_COOKIE["cesta"];
+                    $cesta = explode("##", $linea);
+                    for ($i=0; $i < count($cesta)-1; $i++) { 
+                        $compra = explode("|", $cesta[$i]);
+                        if ($compra[0] == $id_producto) {
+                            $compra[2] += $cantidad;
+                            $encontrado = false;
+                            $cesta[$i] = implode("|",$compra);
+                        }
+                    }
+                    if ($encontrado) {
+                        $linea = $_COOKIE["cesta"] . ($id_producto . '|' . $nombre . '|' . $cantidad . "##" );
+                    }else
+                        $linea = implode("##",$cesta);
+                    
+
+                }
+                else
+                {
+                    $linea =($id_producto . '|' . $nombre . '|' . $cantidad . "##" );
+                }
+                hacerCookieCesta($linea);
+                
+                $linea = explode("##", $linea);
+                for ($i=0; $i < count($linea)-1; $i++) { 
+                    $compra = explode("|", $linea[$i]);
+                    imprimirCesta($compra[1],$compra[2]);
+                }
+                    
+            }   
+            catch(PDOException $e) {
+                erroresBBDD($e->getMessage());
+            }
+    
+            cerrarConexion($conn);
+            
+        }
+        else 
+            mensajeNoCompraCli($nombre);
+        
+    }
+    function realizarCompraFinal($nif)
+    {
+        try {
+            $conn = abrirConexion();
+            $linea = $_COOKIE["cesta"];
+            $cesta = explode("##", $linea);
+            for ($i=0; $i < count($cesta)-1; $i++)
+            { 
+                $compra = explode("|", $cesta[$i]);
+                $num_almacen = comprobarAlmacen($compra[1],$compra[2]);
+
+                if ($num_almacen != 0)
+                {
+                    $stmt = $conn->prepare("SELECT cantidad FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and almacena.num_almacen = '$num_almacen' and id_producto = '$compra[0]'");
+                    $stmt->execute();
+                    $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                    $cantidad=$stmt->fetchAll();
+                    $cantidad = empty($cantidad) ? $cantidad : $cantidad[0]['cantidad'];
+                    $fecha_compra = date("Y-m-d h:m:s");
+                    if ($cantidad >= $compra[2] &&  !empty($cantidad)) {
+                        $conn->beginTransaction();
+                            $stmt = $conn->prepare("INSERT INTO compra (nif,id_producto,fecha_compra,unidades) values  ('$nif','$compra[0]','$fecha_compra','$compra[2]')");
+                            $stmt->execute();
+                            $stmt = $conn->prepare("UPDATE ALMACENA SET CANTIDAD = $cantidad-$compra[2] where id_producto = '$compra[0]'");
+                            $stmt->execute();
+                            mensajeCompraFinal($compra[1],$compra[2]);
+                        $conn->commit();
+                    } else 
+                    {
+                        $cantidad = empty($cantidad) ? 0 : $cantidad;
+                        mensajeNoCompraFinal($compra[1],$cantidad,$compra[2]);
+                    }
+                }
+            }
+        }
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+
+        cerrarConexion($conn);
+    }  
 ?>
 
 <?php //EXCEPCIONES----------------------------------------------------------------------------------------------------------------
@@ -520,6 +644,10 @@
     {
         echo "Este cliente no ha comprado nada.";
     }
+    function imprimirMontanteFinal($precioTotal)
+    {
+        echo "El montate total de las compras de este cliente es de " . $precioTotal;
+    }
     //---------------------------------------
     function imprimirInicioDesplegable($dato)
     {
@@ -551,4 +679,31 @@
     {
         echo "FALLO DE AUTENTIFICACIÓN<br>";
     }
+    function mensajeNoCompraCli($nombre)
+    {
+        echo "No se ha podido realizar la compra del producto: $nombre, ya que no hay suficientes existencias";
+    }
+
+    function mensajeNoCompraFinal($nombre,$cantidad,$cantidadCompra)
+    {
+        echo "No se ha podido realizar la compra del producto: $nombre, ya que el almacen tiene $cantidad unidades y la compra es de $cantidadCompra ";
+    }
+    function mensajeCompraFinal($nombre,$cantidadCompra)
+    {
+        echo "Se ha realizado la compra al almacen de $cantidadCompra unidades del producto: $nombre. ";
+    }
+    //----------------------------------------
+    function imprimirInicioCesta()
+    {
+        echo "<table border=1><tr><th>Producto</th><th>Cantidad</th></tr> ";
+    } 
+    function imprimirCesta($nombre,$cantidad)
+    {
+        echo "<tr><td>$nombre</td><td>$cantidad</td></tr>";
+    }
+    function imprimirfinCesta()
+    {
+        echo "</table>";
+    } 
+    //----------------------------------------
 ?>

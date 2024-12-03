@@ -28,10 +28,11 @@
                 $usuario     = recogerDatos("usuario");
                 $contrasenia = recogerDatos("passw");
                 $comprobarDatos = busquedaBBDD($usuario,$contrasenia);
+                
                 if (!empty($comprobarDatos))
                 {
-                    hacerCoockie($usuario,$contrasenia);
-                    cambiarAcceso($usuario);
+                    $NIF = buscarNif($usuario);
+                    hacerCoockie($NIF);
                 }elseif(!isset($_COOKIE["USERPASS"])) {
                     mensajeFallo();
                 }

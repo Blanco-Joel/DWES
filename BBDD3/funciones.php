@@ -332,11 +332,13 @@
     }
 
 
-    function busquedaBBDD($dato1,$dato2)
+    function busquedaBBDD($dato1)
     {
         try {
             $conn = abrirConexion();
-            $select = $conn->prepare("SELECT ContactLastName FROM customers WHERE customerNumber = '$dato1'");
+            $fecha_actual = date("Y-m-d h:i:s", strtotime("+60 minute"));
+            var_dump($fecha_actual);
+            $select = $conn->prepare("SELECT clave FROM customers WHERE customerNumber = '$dato1' and (fecha_exp_bloq <= '$fecha_actual' or fecha_exp_bloq is null )");
             $select->execute();
             $resultado = $select->fetchAll();
         }   
@@ -432,6 +434,41 @@
 
         cerrarConexion($conn);
     }  
+
+    function bloqueoUser($usuario)
+    {
+        try {
+            $conn = abrirConexion();
+            $conn->beginTransaction();
+            $fecha_bloq = date("Y-m-d h:i:s", strtotime("+60 minute"));
+            $fecha_exp = date("Y-m-d h:i:s", strtotime("+61 minute"));
+                $stmt = $conn->prepare("UPDATE Customers SET fecha_bloq = '$fecha_bloq' where customerNumber = '$usuario'");
+                $stmt = $conn->prepare("UPDATE Customers SET fecha_exp_bloq = '$fecha_exp' where customerNumber = '$usuario'");
+                $stmt->execute();
+            $conn->commit();
+        }
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+        cerrarConexion($conn);
+    }
+    function  cambiarInicio($usuario,$contrasenia)
+    {
+        try {
+            $conn = abrirConexion();
+            $conn->beginTransaction();
+                $fecha_ult_ses = date("Y-m-d h:i:s", strtotime("+60 minute"));
+                $stmt = $conn->prepare("UPDATE Customers SET fecha_ult_inicio = '$fecha_ult_ses' where customerNumber = '$usuario'");
+                $stmt = $conn->prepare("UPDATE Customers SET clave = '$contrasenia' where customerNumber = '$usuario'");
+                $stmt->execute();
+            $conn->commit();
+        }
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+        cerrarConexion($conn);
+    }
+
 ?>
 
 <?php //EXCEPCIONES----------------------------------------------------------------------------------------------------------------

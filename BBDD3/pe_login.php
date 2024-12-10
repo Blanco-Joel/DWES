@@ -35,20 +35,20 @@
         <?php
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $usuario     = recogerDatos("usuario");
+                $compararClave = recogerDatos("passw");
                 $contrasenia = password_hash(recogerDatos("passw"), PASSWORD_DEFAULT);
-                $comprobarDatos = busquedaBBDD($usuario,$contrasenia);
+                $comprobarDatos = busquedaBBDD($usuario);
+                var_dump($comprobarDatos);
                 if (!empty($comprobarDatos)) 
                 {
-                    if (password_verify($comprobarDatos[0][0],$contrasenia))
+                    if (password_verify($compararClave,$comprobarDatos[0][0]))
                     {
                         hacerCoockie($usuario);
                         session_unset();
                         session_destroy();
-                        setcookie("PHPHSESID","",time()-3600,"/");
-                    }
-                }elseif(!isset($_COOKIE["USERPASS"])) 
-                {   
-                    if (empty($_SESSION['usuario']) || $_SESSION['usuario'] != $usuario)
+                        cambiarInicio($usuario,$contrasenia);
+                        setcookie("PHPHSESSID","",time()-3600,"/");
+                    }elseif (empty($_SESSION['usuario']) || $_SESSION['usuario'] != $usuario)
                     {
                         $_SESSION['usuario'] = $usuario;
                         $_SESSION['contador'] = 1;
@@ -67,7 +67,8 @@
                     mensajeFalloFinal(); 
                     session_unset();
                     session_destroy();
-                    setcookie("PHPHSESID","",time()-3600,"/");
+                    setcookie("PHPSESID","",time()-3600,"/");
+                    bloqueoUser($usuario);
                 }
 
             }

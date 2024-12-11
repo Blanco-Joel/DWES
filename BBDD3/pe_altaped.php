@@ -26,6 +26,7 @@
         <br><br>
 
         Cantidad del producto: <input type='text' name='cantidad' value='' size=5><br><br>
+        Metodo de pago [AA99999]: <input type='text' name='pago' value='' size=5><br><br>
 
         <input type="submit" value="Añadir Producto" name="annadirProd">
         <br><br>
@@ -50,7 +51,8 @@
             if (isset($_POST['comprarCest'])) 
             {
                 $user = $_COOKIE["USERPASS"];
-                realizarCompraFinal($user);
+                $pago = recogerDatos("pago");
+                realizarCompraFinal($user,$pago);
                 boorarCesta();
             }
             if (isset($_POST['borrarCest'])) 

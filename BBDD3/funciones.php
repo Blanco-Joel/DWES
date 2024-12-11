@@ -137,53 +137,6 @@
 
         cerrarConexion($conn);
     }
-
-    /*Recibe los datos para la compra(nif,id_prod,localidad,cantidadCompra), abre la conexion con la BBDD y la hace. */
-    function realizarCompra($nif,$id_prod,$num_almacen,$cantidadCompra)
-    {
-        try {
-            $conn = abrirConexion();
-            $id_producto = substr($id_prod,0,4);
-            $id_prod = substr($id_prod,7);
-            $stmt = $conn->prepare("SELECT cantidad FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and num_almacen = '$num_almacen' and id_producto = '$id_producto'");
-            $stmt->execute();
-            $stmt->setFetchMode(PDO::FETCH_ASSOC);
-            $cantidad=$stmt->fetchAll();
-            $cantidad = empty($cantidad) ? $cantidad : $cantidad[0]['cantidad'];
-
-            $stmt = $conn->prepare("SELECT  nif FROM cliente where nif = '$nif'");
-            $stmt->execute();
-            $stmt->setFetchMode(PDO::FETCH_ASSOC);
-            $existe=$stmt->fetchAll();
-            
-            $fecha_compra = date("Y-m-d h:m:s");
-            if (empty($existe)) {
-                mensajeErrorCliente($nif);
-            }else
-                if ($cantidad >= $cantidadCompra &&  !empty($cantidad)) {
-                    $conn->beginTransaction();
-                        $stmt = $conn->prepare("INSERT INTO compra (nif,id_producto,fecha_compra,unidades) values  ('$nif','$id_producto','$fecha_compra','$cantidadCompra')");
-                        $stmt->execute();
-                        $stmt = $conn->prepare("UPDATE ALMACENA SET CANTIDAD = $cantidad-$cantidadCompra where id_producto = '$id_producto'");
-                        $stmt->execute();
-                        mensajeCompra($id_prod,$localidad,$cantidadCompra);
-                    $conn->commit();
-                } else 
-                {
-                    $cantidad = empty($cantidad) ? 0 : $cantidad;
-                    mensajeNoCompra($id_prod,$localidad,$cantidad,$cantidadCompra);
-                }
-
-
-
-
-        }   
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-
-        cerrarConexion($conn);
-    }  
     function comprobarPedidos($pedido)
     {
         try {
@@ -213,11 +166,62 @@
 
         cerrarConexion($conn);
     }
+    function comprobarPedidosFecha($fecha_inicio,$fecha_final)
+    {
+        try {
+            $conn = abrirConexion();
+            $stmt = $conn->prepare(" SELECT sum(quantityOrdered), productName,orderDate From orderDetails, orders,Products where orderDate >= concat('$fecha_inicio',' 00:00:00') AND orderDate <= concat('$fecha_final',' 23:59:59') AND orders.orderNumber = orderDetails.orderNumber AND orderdetails.productCode = products.productCode group by productName order by orderDate");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $resultado = $stmt->fetchAll();
+            if(!empty($resultado))
+            
+                foreach ($resultado as $compra => $value) 
+                    mensajeCompraFecha($value['sum(quantityOrdered)'],$value['productName'],$value['orderDate']);
+                
+            
+            else
+                mensajeNoHaComprado();
 
-?>
+
+        }   
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+
+        cerrarConexion($conn);
+    }
+    function comprobarPagosFecha($fecha_inicio,$fecha_final)
+    {
+        try {
+            $cliente = $_COOKIE["USERPASS"];
+            $montanteTotal = 0;
+            $conn = abrirConexion();
+            $stmt = $conn->prepare(" select paymentDate,amount from payments where customerNumber = '$cliente' and paymentDate >= '$fecha_inicio' and paymentDate <= '$fecha_final' order by paymentDate");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $resultado = $stmt->fetchAll();
+            if(!empty($resultado))
+            {
+                foreach ($resultado as $compra => $value)
+                { 
+                    mensajePagoFecha($value['paymentDate'],$value['amount']);
+                    $montanteTotal += $value['amount'];
+                }
+                imprimirMontanteFinal($montanteTotal);
+            }
+            else
+                mensajeNoHaComprado();
 
 
-<?php //LÓGICA 2-------------------------------------------------------------------------------------------------------------------
+        }   
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+
+        cerrarConexion($conn);
+    }
+    
     function busquedaBBDD($dato1)
     {
         try {
@@ -247,7 +251,8 @@
             $id_producto = $id_producto[0]["productCode"];
 
             $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
-            $cesta[$id_producto] = isset($cesta[$id_producto]) ? ['nombre' => $cesta[$id_producto]['nombre'], 'cantidad' => $cesta[$id_producto]['cantidad'] + $cantidad] : ['nombre' => $nombre, 'cantidad' => $cantidad];            hacerCookieCesta(serialize($cesta));
+            $cesta[$id_producto] = isset($cesta[$id_producto]) ? ['nombre' => $cesta[$id_producto]['nombre'], 'cantidad' => $cesta[$id_producto]['cantidad'] + $cantidad] : ['nombre' => $nombre, 'cantidad' => $cantidad];      
+            hacerCookieCesta(serialize($cesta));
             foreach ($cesta as $compra) 
                 imprimirCesta($compra['nombre'],$compra['cantidad']);
 
@@ -263,35 +268,31 @@
     {
         try {
             $conn = abrirConexion();
-            $linea = $_COOKIE["cesta"];
-            $cesta = explode("##", $linea);
-            for ($i=0; $i < count($cesta)-1; $i++)
-            { 
-                $compra = explode("|", $cesta[$i]);
-                $num_almacen = comprobarAlmacen($compra[1],$compra[2]);
+            $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
+            foreach ($cesta as $compra => $valor) {
+                var_dump($valor['cantidad']);
+            } 
 
-                if ($num_almacen != 0)
+            $stmt = $conn->prepare("SELECT quantityInStock as cantidad FROM products where productName = '$nombre'");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $cantidad = $stmt->fetchAll();
+         $cantidad = empty($cantidad) ? $cantidad : $cantidad[0]['cantidad'];
+                $fecha_compra = date("Y-m-d h:m:s");
+                if ($cantidad >= $compra[2] &&  !empty($cantidad)) {
+                    $conn->beginTransaction();
+                        $stmt = $conn->prepare("INSERT INTO compra (user,id_producto,fecha_compra,unidades) values  ('$user','$compra[0]','$fecha_compra','$compra[2]')");
+                        $stmt->execute();
+                        $stmt = $conn->prepare("UPDATE ALMACENA SET CANTIDAD = $cantidad-$compra[2] where id_producto = '$compra[0]'");
+                        $stmt->execute();
+                        mensajeCompraFinal($compra[1],$compra[2]);
+                    $conn->commit();
+                } else 
                 {
-                    $stmt = $conn->prepare("SELECT cantidad FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and almacena.num_almacen = '$num_almacen' and id_producto = '$compra[0]'");
-                    $stmt->execute();
-                    $stmt->setFetchMode(PDO::FETCH_ASSOC);
-                    $cantidad=$stmt->fetchAll();
-                    $cantidad = empty($cantidad) ? $cantidad : $cantidad[0]['cantidad'];
-                    $fecha_compra = date("Y-m-d h:m:s");
-                    if ($cantidad >= $compra[2] &&  !empty($cantidad)) {
-                        $conn->beginTransaction();
-                            $stmt = $conn->prepare("INSERT INTO compra (user,id_producto,fecha_compra,unidades) values  ('$user','$compra[0]','$fecha_compra','$compra[2]')");
-                            $stmt->execute();
-                            $stmt = $conn->prepare("UPDATE ALMACENA SET CANTIDAD = $cantidad-$compra[2] where id_producto = '$compra[0]'");
-                            $stmt->execute();
-                            mensajeCompraFinal($compra[1],$compra[2]);
-                        $conn->commit();
-                    } else 
-                    {
-                        $cantidad = empty($cantidad) ? 0 : $cantidad;
-                        mensajeNoCompraFinal($compra[1],$cantidad,$compra[2]);
-                    }
+                    $cantidad = empty($cantidad) ? 0 : $cantidad;
+                    mensajeNoCompraFinal($compra[1],$cantidad,$compra[2]);
                 }
+            }
             }
         }
         catch(PDOException $e) {
@@ -319,6 +320,8 @@
         }
         cerrarConexion($conn);
     }
+
+
     function  cambiarInicio($usuario)
     {
         try {
@@ -398,7 +401,7 @@
 <?php //RECOGIDA DE DATOS DE USUARIO-----------------------------------------------------------------------------------------------
     
     /*Inicio del programa recogiendo y limpiando el dato introducido. Devuelve 
-    el nombre . */
+    el dato . */
     function recogerDatos($campo)
     {   
         $dato = limpiar($_POST["$campo"]);
@@ -406,6 +409,10 @@
         if ($campo == "NIF")
             comprobarNIF($dato);
         return $dato;
+    }
+    function recogerDatosFecha($campo)
+    {   
+        return limpiar($_POST["$campo"]);
     }
 
 ?>
@@ -509,13 +516,22 @@
         echo "Nombre del Producto : $nombre <br>";
         echo "Precio de la compra : $precio <br><hr>";
     }
+    
+    function mensajeCompraFecha($cantidad,$nombre,$fecha)
+    {
+        echo "El día $fecha se compraron $cantidad unidades del producto $nombre.<br>";
+    }
+    function mensajePagoFecha($fecha,$cantidad)
+    {
+        echo "El día $fecha se pagó $cantidad en la compra.<br>";
+    }   
     function mensajeNoHaComprado()
     {
-        echo "Este cliente no ha comprado nada.";
+        echo "Entre estas fechas no ha comprado nada.";
     }
     function imprimirMontanteFinal($precioTotal)
     {
-        echo "El montate total de las compras de este cliente es de " . $precioTotal;
+        echo "<br><hr><br>El montate total de las compras de este cliente es de " . $precioTotal;
     }
     //---------------------------------------
     function imprimirInicioDesplegable($dato)

@@ -31,9 +31,14 @@
         if ($_SERVER["REQUEST_METHOD"] == "POST")  
         {
             if (isset($_POST['comprobar'])) {
-                $fecha_inicio = recogerDatos("ini");
-                $fecha_final = recogerDatos("fin");
-                comprobarPedidosFecha($fecha_inicio,$fecha_final);
+                $fecha_inicio = recogerDatosFecha("ini");
+                $fecha_final = recogerDatosFecha("fin");
+                if (empty($fecha_inicio) && empty($fecha_final)) 
+                    comprobarPagosFecha("0000-00-00","9999-12-31");
+                else
+                    comprobarPagosFecha($fecha_inicio,$fecha_final);
+
+                
             }
 
             if (isset($_POST['cerrarSes'])) {

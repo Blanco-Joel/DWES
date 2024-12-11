@@ -31,6 +31,12 @@
             <li>
                 <a href="./pe_constock.php">Comprobar Stock de una linea de productos </a>
             </li>
+            <li>
+                <a href="./pe_topprod.php">Comprobar venta de productos entre dos fechas </a>
+            </li>
+            <li>
+                <a href="./pe_conspago.php">Comprobar pagos</a>
+            </li>
         </ul>
         <form method="post" name="usuario" class="registro" action=<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>>
             <input type="submit" value="Cerrar sesión" name="cerrar" id="cerrar">

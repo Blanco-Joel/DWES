@@ -20,7 +20,7 @@
 <BODY>
 
     <form name='comprobarStock' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-    <label >Nombre del producto:</label>
+        <label >Nombre del producto:</label>
             <?php crearDesplegableVarios("productLine","products","nombre","1 = 1","productLine")  ?>
         <br><br>
         <input type="submit" value="comprobar" name="comprobar">

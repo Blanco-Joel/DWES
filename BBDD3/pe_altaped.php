@@ -52,7 +52,7 @@
             {
                 $user = $_COOKIE["USERPASS"];
                 $pago = recogerDatos("pago");
-                realizarCompraFinal($user,$pago);
+                realizarCompraFinal($pago);
                 boorarCesta();
             }
             if (isset($_POST['borrarCest'])) 

@@ -264,39 +264,80 @@
         cerrarConexion($conn);
             
     }
-    function realizarCompraFinal($user)
+    function realizarCompraFinal($pago)
     {
         try {
             $conn = abrirConexion();
             $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
-            foreach ($cesta as $compra => $valor) {
-                var_dump($valor['cantidad']);
-            } 
-
-            $stmt = $conn->prepare("SELECT quantityInStock as cantidad FROM products where productName = '$nombre'");
+            $stmt = $conn->prepare("SELECT max(orderNumber)+1 from orders ");
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
-            $cantidad = $stmt->fetchAll();
-         $cantidad = empty($cantidad) ? $cantidad : $cantidad[0]['cantidad'];
+            $numOrder = $stmt->fetchAll();
+            $numOrder = $numOrder[0]['max(orderNumber)+1'];
+            $orderLine = 1;
+            $montante = 0;
+            foreach ($cesta as $compra => $valor)
+            {
+                $nombre = $valor['nombre'];
+
+                $stmt = $conn->prepare("SELECT quantityInStock as cantidad FROM products where productName = '$nombre' ");
+                $stmt->execute();
+                $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                $cantidad = $stmt->fetchAll();
+                $cantidad = empty($cantidad) ? $cantidad : $cantidad[0]['cantidad'];
+                
+                $cantidadCompra = $valor['cantidad'];
+                
                 $fecha_compra = date("Y-m-d h:m:s");
-                if ($cantidad >= $compra[2] &&  !empty($cantidad)) {
+                
+                $cliente = $_COOKIE["USERPASS"];
+
+                if ($cantidad >= $cantidadCompra &&  !empty($cantidad))
+                {
                     $conn->beginTransaction();
-                        $stmt = $conn->prepare("INSERT INTO compra (user,id_producto,fecha_compra,unidades) values  ('$user','$compra[0]','$fecha_compra','$compra[2]')");
+
+                        if ($orderLine == 1) 
+                        {
+                            $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
+                                                    values  ('$numOrder','$fecha_compra','$fecha_compra','In Process','$cliente')");
+                            $stmt->execute();
+                        }
+
+                        $stmt = $conn->prepare("SELECT buyPrice FROM products where productName = '$nombre'");
                         $stmt->execute();
-                        $stmt = $conn->prepare("UPDATE ALMACENA SET CANTIDAD = $cantidad-$compra[2] where id_producto = '$compra[0]'");
+                        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                        $precio = $stmt->fetchAll();
+                        $precio = $precio[0]['buyPrice'];
+
+                        $stmt = $conn->prepare("INSERT INTO `orderdetails` (`orderNumber`, `productCode`, `quantityOrdered`, `priceEach`, `orderLineNumber`) 
+                                                VALUES                     ('$numOrder', '$compra', '$cantidadCompra', '$precio', '$orderLine')");
                         $stmt->execute();
-                        mensajeCompraFinal($compra[1],$compra[2]);
+                        $orderLine += 1; 
+
+                        $stmt = $conn->prepare("UPDATE products SET quantityInStock = $cantidad-$cantidadCompra where productName = '$nombre'");
+                        $stmt->execute();
+                        $montante += $precio*$cantidadCompra; 
+                        if (count($cesta)-1 == $orderLine) 
+                        {
+                            $stmt = $conn->prepare("INSERT INTO payments (customerNumber,checkNumber,paymentDate,amount) 
+                                                    values               ('$cliente','$pago','$fecha_compra','$cantidadCompra')");
+                            $stmt->execute();                     
+                        }
+
+                        
+                        mensajeCompraFinal($nombre,$cantidadCompra);
                     $conn->commit();
                 } else 
                 {
                     $cantidad = empty($cantidad) ? 0 : $cantidad;
-                    mensajeNoCompraFinal($compra[1],$cantidad,$compra[2]);
+                    mensajeNoCompraFinal($nombre,$cantidad,$cantidadCompra);
                 }
             }
-            }
+        
+            
         }
         catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
+            echo $e->getMessage();
         }
 
         cerrarConexion($conn);
@@ -579,7 +620,7 @@
     }
     function mensajeCompraFinal($nombre,$cantidadCompra)
     {
-        echo "Se ha realizado la compra al almacen de $cantidadCompra unidades del producto: $nombre. ";
+        echo "Se ha realizado la compra al almacen de $cantidadCompra unidades del producto: $nombre. <br>";
     }
     function imprimirNumeroPedido($id,$fecha,$estado)
     {

@@ -31,6 +31,7 @@
             <label>Contraseña</label>
             <input type="text"  id="passw" name="passw">
             <input type="submit" value="Aceptar" name="aceptar" id="aceptar">
+            <button type="submit"><a href="./pe_signin.php">Sign In</a></button>
         </form>
         <?php
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -38,7 +39,6 @@
                 $compararClave = recogerDatos("passw");
                 $contrasenia = password_hash(recogerDatos("passw"), PASSWORD_DEFAULT);
                 $comprobarDatos = busquedaBBDD($usuario);
-                var_dump($comprobarDatos);
                 if (!empty($comprobarDatos)) 
                 {
                     if (password_verify($compararClave,$comprobarDatos[0][0]))
@@ -46,7 +46,7 @@
                         hacerCoockie($usuario);
                         session_unset();
                         session_destroy();
-                        cambiarInicio($usuario,$contrasenia);
+                        cambiarInicio($usuario);
                         setcookie("PHPHSESSID","",time()-3600,"/");
                     }elseif (empty($_SESSION['usuario']) || $_SESSION['usuario'] != $usuario)
                     {
@@ -59,8 +59,6 @@
                         mensajeFallo(); 
                     }
                 }
-                var_dump($_SESSION['contador']);
-                var_dump($_SESSION['usuario']);
                 
                 if ($_SESSION['contador'] == 3)               
                 {
@@ -70,7 +68,7 @@
                     setcookie("PHPSESID","",time()-3600,"/");
                     bloqueoUser($usuario);
                 }
-
+            
             }
             ?>
     </body>

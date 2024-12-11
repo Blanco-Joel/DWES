@@ -19,9 +19,8 @@
 <BODY>
 
     <form name='altaCat' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        Priemra Fecha[AAAA-MM-DD]: <input type='text' name='ini' value='' size=15><br><br>
-        Segunda Fecha[AAAA-MM-DD]: <input type='text' name='fin' value='' size=15><br><br>
-        <input type="submit" value="Comprobar" name="comprobar">
+        <?php $cliente = $_COOKIE["USERPASS"];crearDesplegable("orderNumber,' || ', orderDate","orders","pedido","customerNumber = '$cliente'")  ?>
+        <input type="submit" value="Comprobar Pedido" name="comprobar">
         <input type="submit" value="Cerrar Sesion" name="cerrarSes">   
 
 
@@ -31,10 +30,8 @@
         {
             if(isset($_POST['comprobar']))
             {
-                $fecha_inicio = recogerDatos("ini");
-                $fecha_final = recogerDatos("fin");
-                $NIF = $_COOKIE["USERPASS"];
-                comprobarCompras($NIF,$fecha_inicio,$fecha_final);
+                $pedido = recogerDatos("pedido");             
+                comprobarPedidos($pedido);
             }
             
             if (isset($_POST['cerrarSes'])) {

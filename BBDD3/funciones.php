@@ -62,78 +62,7 @@
     {
         $conn = null;
     }
-
-    /*Recibe el nombre de la categoria a introducir, abre la conexion con la BBDD y lo introduce  . */
-    function introducirCat($nombre)
-    {
-        try {
-            $conn = abrirConexion();
-
-            $id_cat = $conn->query("SELECT IFNULL(CONCAT('C00',CAST(SUBSTR(MAX(ID_CATEGORIA), 2) AS UNSIGNED) + 1),'C001') as COD FROM CATEGORIA ");
-            $id_cat=$id_cat->fetchColumn();
-            $conn->beginTransaction();
-                $stmt = $conn->prepare("INSERT INTO categoria (id_categoria,nombre) values  (:id_cat,:nombre) ");
-                $stmt->bindParam(':id_cat', $id_cat  );
-                $stmt->bindParam(':nombre', $nombre);
-                $stmt->execute();
-            $conn->commit();
-
-            mensajeCat ($nombre,$id_cat);
-
-
-        }   
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-
-        cerrarConexion($conn);
-    }
-
-    /*Recibe los datos a introducir en la tabla producto, abre la conexion con la BBDD y lo introduce  . */
-    function introducirProd($nombre,$precio,$id_categoria)
-    {
-        try {
-            $conn = abrirConexion();
-            $id_categoria = substr($id_categoria,0,4);
-            $id_prod = $conn->query("SELECT IFNULL(CONCAT('P00',CAST(SUBSTR(MAX(ID_PRODUCTO), 2) AS UNSIGNED) + 1),'P001') as COD FROM PRODUCTO");
-            $id_prod = $id_prod->fetchColumn();
-
-            $conn->beginTransaction();
-                $stmt = $conn->prepare("INSERT INTO Producto (id_producto,nombre,precio,id_categoria) values  ('$id_prod','$nombre','$precio','$id_categoria') ");
-                $stmt->execute();
-            $conn->commit();
-
-        
-            mensajeProd($nombre,$id_prod,$id_categoria);
-
-        }   
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-
-        cerrarConexion($conn);
-    }
-    /*Recibe los datos a introducir en la tabla almacen, abre la conexion con la BBDD y lo introduce  . */
-    function introducirAlm($localidad)
-    {
-        try {
-            $conn = abrirConexion();
-            $conn->beginTransaction();
-                $stmt = $conn->prepare("INSERT INTO Almacen (localidad) values  ('$localidad')");
-                $stmt->execute();
-            $conn->commit();
-
-        
-            mensajeAlm($localidad);
-
-        }   
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-
-        cerrarConexion($conn);
-    }
-    
+   
     /*Recibe los datos a introducir en la tabla almacena, abre la conexion con la BBDD y lo introduce  . */
     function introducirCantProd($id_prod,$num_almacen,$cantidad)
     {
@@ -170,20 +99,16 @@
         cerrarConexion($conn);
     }
     /*Recibe el nombre y el id del productoa listar de la tabla almacena, abre la conexion con la BBDD y lo imprime  . */
-    function listarCantProd($id_producto)
+    function comprobarStock($nombre)
     {
         try {
-            $id_prod = substr($id_producto,0,4);
-            $id_producto = substr($id_producto,7);
             $conn = abrirConexion();
-            $stmt = $conn->prepare("SELECT concat(cantidad,'|',num_almacen) as resultado FROM almacena,almacen where almacen.num_almacen = almacena.num_almacen and id_producto = '$id_prod'");
+            $stmt = $conn->prepare("SELECT quantityInStock as resultado FROM products where productName = '$nombre'");
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $resultado = $stmt->fetchAll();
-            foreach ($resultado as $almacen => $linea) {
-                $cantidad = explode("|",$linea['resultado']);
-                imprimirCantidades($cantidad[0],$cantidad[1],$id_producto);
-            }
+            imprimirCantidades($resultado[0]['resultado'],$nombre);
+
 
         }   
         catch(PDOException $e) {
@@ -192,39 +117,18 @@
 
         cerrarConexion($conn);
     }
-    /*Recibe el nombre y el id del productoa listar de la tabla almacena, abre la conexion con la BBDD y lo imprime  . */
-    function listarProdAlm($num_almacen)
+    function comprobarStockLinea($nombre)
     {
         try {
             $conn = abrirConexion();
-            $stmt = $conn->prepare("SELECT concat(cantidad,'|',nombre) as resultado FROM almacena,producto,almacen where almacen.num_almacen = almacena.num_almacen and almacena.id_producto = producto.id_producto ");
+            $stmt = $conn->prepare(" SELECT quantityInStock,productName FROM products where productLine = '$nombre' order by quantityinStock desc");
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $resultado = $stmt->fetchAll();
-            foreach ($resultado as $almacen => $linea) {
-                $cantidad = explode("|",$linea['resultado']);
-                imprimirCantidades($cantidad[0],$num_almacen,$cantidad[1]);
+            foreach ($resultado as $line => $value) {
+                imprimirCantidades($value['quantityInStock'],$value['productName']);
             }
 
-        }   
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-
-        cerrarConexion($conn);
-    }
-    /*Recibe los datos a introducir en la tabla cliente, abre la conexion con la BBDD y lo introduce  . */
-    function introducirCliente($nif)
-    {
-        try {
-            $conn = abrirConexion();
-            $conn->beginTransaction();
-                $stmt = $conn->prepare("INSERT INTO Cliente (NIF) values  ('$nif')");
-                $stmt->execute();
-            $conn->commit();
-
-        
-            mensajeCliente($nif);
 
         }   
         catch(PDOException $e) {
@@ -280,26 +184,27 @@
 
         cerrarConexion($conn);
     }  
-    function comprobarCompras($NIF,$fecha_inicio,$fecha_final)
+    function comprobarPedidos($pedido)
     {
         try {
             $conn = abrirConexion();
-            $stmt = $conn->prepare(" SELECT producto.id_producto, producto.nombre, (precio*unidades) FROM compra,producto WHERE producto.id_producto = compra.id_producto and fecha_compra >= concat('$fecha_inicio',' 00:00:00') AND fecha_compra <= concat('$fecha_final',' 23:59:59')  AND nif = '$NIF'");
-            $precioTotal = 0;
+            $pedido = explode(" || ",$pedido); 
+            $stmt = $conn->prepare(" SELECT orders.orderNumber, orders.orderDate,orders.status,productName,quantityOrdered,orderLineNumber,priceEach
+                                     FROM orders,orderdetails,products 
+                                     WHERE orders.orderNumber = orderdetails.orderNumber and orderDetails.productCode = products.productCode and orders.orderNumber = '$pedido[0]' 
+                                     order by orderLineNumber;");
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $resultado = $stmt->fetchAll();
             if(!empty($resultado))
             {
-                foreach ($resultado as $almacen => $linea) 
+                imprimirNumeroPedido($resultado[0]['orderNumber'], $resultado[0]['orderDate'], $resultado[0]['status']);
+                foreach ($resultado as $pedidos => $linea) 
                 {
-                    imprirmirListaCompras($linea['id_producto'], $linea['nombre'], $linea['(precio*unidades)']);
-                    $precioTotal += $linea['(precio*unidades)']; 
+                    imprirmirListaPedido($linea['orderLineNumber'],$linea['productName'], $linea['quantityOrdered'], $linea['priceEach']);
                 }
-                imprimirMontanteFinal($precioTotal);
             }
-            else
-                mensajeNoHaComprado();
+
 
         }   
         catch(PDOException $e) {
@@ -313,31 +218,11 @@
 
 
 <?php //LÓGICA 2-------------------------------------------------------------------------------------------------------------------
-    function introducirClienteCompleto($nif,$nombre,$apellido,$cp,$direccion,$ciudad)
-    {
-        try {
-            $conn = abrirConexion();
-            $conn->beginTransaction();
-                $stmt = $conn->prepare("INSERT INTO Cliente (NIF,NOMBRE,APELLIDO,CP,DIRECCION,CIUDAD) values  ('$nif','$nombre','$apellido','$cp','$direccion','$ciudad')");
-                $stmt->execute();
-            $conn->commit();
-            $apellido = implode("",array_reverse(str_split($apellido)));
-            mensajeClienteCompleto($nif,$nombre,$apellido);
-        }   
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-
-        cerrarConexion($conn);
-    }
-
-
     function busquedaBBDD($dato1)
     {
         try {
             $conn = abrirConexion();
             $fecha_actual = date("Y-m-d h:i:s", strtotime("+60 minute"));
-            var_dump($fecha_actual);
             $select = $conn->prepare("SELECT clave FROM customers WHERE customerNumber = '$dato1' and (fecha_exp_bloq <= '$fecha_actual' or fecha_exp_bloq is null )");
             $select->execute();
             $resultado = $select->fetchAll();
@@ -347,24 +232,6 @@
         }
         cerrarConexion($conn);
         return $resultado;
-    }
-
-    function comprobarAlmacen($nombre,$cantidad)
-    {
-        try {
-            $conn = abrirConexion();
-            $select = $conn->prepare("SELECT almacen.num_almacen  FROM almacen,almacena,producto WHERE producto.id_producto = almacena.id_producto AND almacen.num_almacen = almacena.num_almacen AND producto.nombre = '$nombre' AND cantidad >= '$cantidad'");
-            $select->execute();
-            $select->setFetchMode(PDO::FETCH_ASSOC);
-            $resultado = $select->fetchAll();
-            $num_almacen = (!empty($resultado)) ? $resultado[0]['num_almacen'] : 0 ;
-        }   
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-
-        cerrarConexion($conn);
-        return $num_almacen;
     }
 
     function annadirProductoCesta($nombre,$cantidad)
@@ -381,7 +248,6 @@
 
             $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
             $cesta[$id_producto] = isset($cesta[$id_producto]) ? ['nombre' => $cesta[$id_producto]['nombre'], 'cantidad' => $cesta[$id_producto]['cantidad'] + $cantidad] : ['nombre' => $nombre, 'cantidad' => $cantidad];            hacerCookieCesta(serialize($cesta));
-            var_dump($cesta);
             foreach ($cesta as $compra) 
                 imprimirCesta($compra['nombre'],$compra['cantidad']);
 
@@ -440,10 +306,11 @@
         try {
             $conn = abrirConexion();
             $conn->beginTransaction();
-            $fecha_bloq = date("Y-m-d h:i:s", strtotime("+60 minute"));
-            $fecha_exp = date("Y-m-d h:i:s", strtotime("+61 minute"));
-                $stmt = $conn->prepare("UPDATE Customers SET fecha_bloq = '$fecha_bloq' where customerNumber = '$usuario'");
+                $fecha_bloq = date("Y-m-d h:i:s", strtotime("+60 minute"));
+                $fecha_exp = date("Y-m-d h:i:s", strtotime("+61 minute"));
                 $stmt = $conn->prepare("UPDATE Customers SET fecha_exp_bloq = '$fecha_exp' where customerNumber = '$usuario'");
+                $stmt->execute();
+                $stmt = $conn->prepare("UPDATE Customers SET fecha_bloq = '$fecha_bloq' where customerNumber = '$usuario'");
                 $stmt->execute();
             $conn->commit();
         }
@@ -452,14 +319,13 @@
         }
         cerrarConexion($conn);
     }
-    function  cambiarInicio($usuario,$contrasenia)
+    function  cambiarInicio($usuario)
     {
         try {
             $conn = abrirConexion();
             $conn->beginTransaction();
                 $fecha_ult_ses = date("Y-m-d h:i:s", strtotime("+60 minute"));
                 $stmt = $conn->prepare("UPDATE Customers SET fecha_ult_inicio = '$fecha_ult_ses' where customerNumber = '$usuario'");
-                $stmt = $conn->prepare("UPDATE Customers SET clave = '$contrasenia' where customerNumber = '$usuario'");
                 $stmt->execute();
             $conn->commit();
         }
@@ -469,6 +335,25 @@
         cerrarConexion($conn);
     }
 
+    function crearUsuario($customerName, $contactLastName, $contactFirstName, $clave,$telefono)
+    {
+        try {
+            $conn = abrirConexion();
+            $num_siguiente = $conn->prepare("SELECT MAX(customerNumber)+1 FROM CUSTOMERS  ");
+            $num_siguiente->execute();
+            $num_siguiente->setFetchMode(PDO::FETCH_NUM);
+            $num_siguiente=$num_siguiente->fetchAll();
+            $num_siguiente = $num_siguiente[0][0];
+            $conn->beginTransaction();
+                $stmt = $conn->prepare("INSERT INTO Customers (`customerNumber`, `customerName`, `contactLastName`, `contactFirstName`, `phone`, `addrebLine1`, `addrebLine2`, `city`, `state_code`, `postalCode`, `country`, `salesRepEmployeeNumber`, `creditLimit`, `clave`, `fecha_ult_inicio`, `fecha_bloq`, `fecha_exp_bloq`) VALUES ('$num_siguiente', '$customerName', ' $contactLastName', '$contactFirstName','$telefono', 'Calle Alcalá,1', NULL, 'Madrid', NULL, NULL, 'España', NULL, NULL, '$clave', NULL, NULL, NULL)");
+                $stmt->execute();
+            $conn->commit();
+        }
+        catch(PDOException $e) {
+            erroresBBDD($e->getMessage());
+        }
+        cerrarConexion($conn);
+    }
 ?>
 
 <?php //EXCEPCIONES----------------------------------------------------------------------------------------------------------------
@@ -548,7 +433,6 @@
     function crearDesplegable($select,$table,$id,$where)
     {
         $conn = abrirConexion();
-
         imprimirInicioDesplegable($id);
         $stmt = $conn->prepare("SELECT concat($select) as resul FROM $table where $where order by 1");
         $stmt->execute();
@@ -561,18 +445,17 @@
         cerrarConexion($conn);
     }
 
-    /* Crea un desplegable con los almacenes de la BBDD. */
-    function crearDesplegableAlm()
+    /* Crea un desplegable con las categorias de la BBDD. */
+    function crearDesplegableVarios($select,$table,$id,$where,$groupBy)
     {
         $conn = abrirConexion();
-
-        imprimirInicioDesplegable("localidad");
-        $stmt = $conn->prepare("SELECT localidad FROM almacen order by localidad");
+        imprimirInicioDesplegable($id);
+        $stmt = $conn->prepare("SELECT concat($select) as resul FROM $table where $where group by $groupBy order by 1 ");
         $stmt->execute();
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $resultado=$stmt->fetchAll();
         foreach($resultado as $linea) 
-            imprimirCuerpoDesplegable($linea["localidad"]);
+            imprimirCuerpoDesplegable($linea["resul"]);
 
         imprimirFinalDesplegable();
         cerrarConexion($conn);
@@ -600,9 +483,9 @@
     {
         echo "Se han introducido $cantidad unidades del producto: $id_producto en el almacen de la localidad $localidad ";
     }
-    function  imprimirCantidades($cantidad,$localidad,$id_producto)
+    function  imprimirCantidades($cantidad,$nombre)
     {
-        echo "En el almacen de $localidad hay $cantidad unidades del producto: $id_producto.<br>";
+        echo "Hay $cantidad  unidades del producto: $nombre.<br>";
     }
     function mensajeCliente($nif)
     {
@@ -681,6 +564,16 @@
     function mensajeCompraFinal($nombre,$cantidadCompra)
     {
         echo "Se ha realizado la compra al almacen de $cantidadCompra unidades del producto: $nombre. ";
+    }
+    function imprimirNumeroPedido($id,$fecha,$estado)
+    {
+        echo "<pre>ID de la pedido : $id || Fecha de la pedido : $fecha || Estado del pedido : $estado </pre><hr>";
+        echo "<table border=1>";
+        echo "<tr><th>Line</th><th>Product</th><th>Quantity</th><th>Price</th></tr>";
+    }
+    function imprirmirListaPedido($orderLineNumber,$productName, $quantityOrdered , $priceEach)
+    {
+        echo "<tr><th>$orderLineNumber</th><td>$productName</td><td>$quantityOrdered</td><td>$priceEach</td></tr>";
     }
     //----------------------------------------
     function imprimirInicioCesta()

@@ -23,7 +23,13 @@
                 <a href="./pe_altaped.php">Realizar Pedido </a>
             </li>
             <li>
-                <a href="./comconscli.php">Comprobar Compras </a>
+                <a href="./pe_consped.php">Comprobar Compras </a>
+            </li>
+            <li>
+                <a href="./pe_consprodstock.php">Comprobar Stock de un producto </a>
+            </li>
+            <li>
+                <a href="./pe_constock.php">Comprobar Stock de una linea de productos </a>
             </li>
         </ul>
         <form method="post" name="usuario" class="registro" action=<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>>

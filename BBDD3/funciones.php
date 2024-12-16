@@ -275,7 +275,19 @@
             $numOrder = $stmt->fetchAll();
             $numOrder = $numOrder[0]['max(orderNumber)+1'];
             $orderLine = 1;
+            
             $montante = 0;
+
+            $fecha_compra = date("Y-m-d h:m:s");
+            
+            $cliente = $_COOKIE["USERPASS"];
+
+            $conn->beginTransaction();
+                $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
+                                        values  ('$numOrder','$fecha_compra','$fecha_compra','In Process','$cliente')");
+                $stmt->execute();
+            $conn->commit();
+
             foreach ($cesta as $compra => $valor)
             {
                 $nombre = $valor['nombre'];
@@ -288,21 +300,10 @@
                 
                 $cantidadCompra = $valor['cantidad'];
                 
-                $fecha_compra = date("Y-m-d h:m:s");
-                
-                $cliente = $_COOKIE["USERPASS"];
 
                 if ($cantidad >= $cantidadCompra &&  !empty($cantidad))
                 {
                     $conn->beginTransaction();
-
-                        if ($orderLine == 1) 
-                        {
-                            $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
-                                                    values  ('$numOrder','$fecha_compra','$fecha_compra','In Process','$cliente')");
-                            $stmt->execute();
-                        }
-
                         $stmt = $conn->prepare("SELECT buyPrice FROM products where productName = '$nombre'");
                         $stmt->execute();
                         $stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -317,14 +318,7 @@
                         $stmt = $conn->prepare("UPDATE products SET quantityInStock = $cantidad-$cantidadCompra where productName = '$nombre'");
                         $stmt->execute();
                         $montante += $precio*$cantidadCompra; 
-                        if (count($cesta)-1 == $orderLine) 
-                        {
-                            $stmt = $conn->prepare("INSERT INTO payments (customerNumber,checkNumber,paymentDate,amount) 
-                                                    values               ('$cliente','$pago','$fecha_compra','$cantidadCompra')");
-                            $stmt->execute();                     
-                        }
-
-                        
+                       
                         mensajeCompraFinal($nombre,$cantidadCompra);
                     $conn->commit();
                 } else 
@@ -333,8 +327,12 @@
                     mensajeNoCompraFinal($nombre,$cantidad,$cantidadCompra);
                 }
             }
-        
-            
+            $conn->beginTransaction();
+                $stmt = $conn->prepare("INSERT INTO payments (customerNumber,checkNumber,paymentDate,amount) 
+                                        values               ('$cliente','$pago','$fecha_compra','$montante')");
+                $stmt->execute();     
+            $conn->commit();
+
         }
         catch(PDOException $e) {
             echo $e->getMessage();

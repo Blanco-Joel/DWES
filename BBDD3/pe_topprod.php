@@ -13,6 +13,7 @@
  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <title>BBDD</title>
+     <link 
   </head>
 
 </HEAD>
@@ -23,8 +24,9 @@
         Segunda Fecha[AAAA-MM-DD]: <input type='text' name='fin' value='' size=15><br><br>
         
 
-        <input type="submit" value="Comprobar" name="comprobar">
-        <input type="submit" value="Cerrar sesión" name="cerrarSes" id="cerrarSes">
+        <input type="submit" value="Comprobar" name="comprobar"><br><br>
+        <input type="button" onclick="location.href='./pe_inicio.php';" value="MENÚ" /><br><br>
+        <input type="submit" value="Cerrar sesión" name="cerrarSes" id="cerrarSes"><br><br>
 
     </FORM>
     <?php

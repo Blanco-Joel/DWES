@@ -27,12 +27,12 @@
         <h1>FORMULARIO</h1>
         <form method="post" name="usuario" class="registro" action=<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>>
             <label>Usuario</label>
-            <input type="text"  id="usuario" name="usuario">
+            <input type="text"  id="usuario" name="usuario"><br><br>
             <label>Contraseña</label>
-            <input type="text"  id="passw" name="passw">
-            <input type="submit" value="Aceptar" name="aceptar" id="aceptar">
-            <button type="submit"><a href="./pe_signin.php">Sign In</a></button>
-        </form>
+            <input type="text"  id="passw" name="passw"><br><br>
+            <input type="submit" value="Aceptar" name="aceptar" id="aceptar"><br><br>
+            <input type="button" onclick="location.href='./pe_signin.php';" value="SIGN IN" /><br><br>
+            </form>
         <?php
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $usuario     = recogerDatos("usuario");

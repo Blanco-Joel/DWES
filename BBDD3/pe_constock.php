@@ -23,9 +23,10 @@
         <label >Nombre del producto:</label>
             <?php crearDesplegableVarios("productLine","products","nombre","1 = 1","productLine")  ?>
         <br><br>
-        <input type="submit" value="comprobar" name="comprobar">
-        <input type="submit" value="Cerrar sesión" name="cerrarSes" id="cerrarSes">
-    </form>
+        <input type="submit" value="comprobar" name="comprobar"><br><br>
+        <input type="button" onclick="location.href='./pe_inicio.php';" value="MENÚ" /><br><br>
+        <input type="submit" value="Cerrar sesión" name="cerrarSes" id="cerrarSes"><br><br>
+        </form>
     <?php
         if ($_SERVER["REQUEST_METHOD"] == "POST")      
         {

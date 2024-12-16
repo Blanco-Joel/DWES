@@ -17,20 +17,20 @@
         <h1>Sign In</h1>
         <form action = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
             <label for="customerName">Customer Name:</label>
-            <input type="text" id="customerName" name="customerName" required>
+            <input type="text" id="customerName" name="customerName"><br><br>
             
             <label for="contactLastName">Contact Last Name:</label>
-            <input type="text" id="contactLastName" name="contactLastName" required>
+            <input type="text" id="contactLastName" name="contactLastName"><br><br>
             
             <label for="contactFirstName">Contact First Name:</label>
-            <input type="text" id="contactFirstName" name="contactFirstName" required>
+            <input type="text" id="contactFirstName" name="contactFirstName"><br><br>
             
             <label for="telefono">Teléfono:</label>
-            <input type="text" id="telefono" name="telefono" required>
+            <input type="text" id="telefono" name="telefono"><br><br>
             
-            <button type="submit">Sign In</button>
-            <button type="submit"><a href="./pe_login.php">Log In</a></button>
-        </form>
+            <button type="submit">Sign In</button><br><br>
+            <input type="button" onclick="location.href='./pe_login.php';" value="LOG IN" /><br><br>
+            </form>
     </div>
     <?php
             if ($_SERVER["REQUEST_METHOD"] == "POST") {

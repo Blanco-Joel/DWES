@@ -19,9 +19,11 @@
 <BODY>
 
     <form name='altaCat' action= <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method='POST'>
-        <?php $cliente = $_COOKIE["USERPASS"];crearDesplegable("orderNumber,' || ', orderDate","orders","pedido","customerNumber = '$cliente'")  ?>
-        <input type="submit" value="Comprobar Pedido" name="comprobar">
-        <input type="submit" value="Cerrar Sesion" name="cerrarSes">   
+        <?php $cliente = $_COOKIE["USERPASS"];crearDesplegable("orderNumber,' || ', orderDate","orders","pedido","customerNumber = '$cliente'")  ?><br><br>
+        <input type="submit" value="Comprobar Pedido" name="comprobar"><br><br>
+        <input type="button" onclick="location.href='./pe_inicio.php';" value="MENÚ" /><br><br>
+
+        <input type="submit" value="Cerrar Sesion" name="cerrarSes">   <br><br>
 
 
     </FORM>

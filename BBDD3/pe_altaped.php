@@ -34,6 +34,8 @@
         <br><br>
         <input type="submit" value="Eliminar Cesta" name="borrarCest">
         <br><br>
+        <input type="button" onclick="location.href='./pe_inicio.php';" value="MENÚ" />
+        <br><br>
         <input type="submit" value="Cerrar Sesion" name="cerrarSes">   
         <br><br><br>
 

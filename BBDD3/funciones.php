@@ -1,3 +1,6 @@
+<?php // INCLUSION API
+    require_once('./apiRedsys.php');
+?>
 
 <?php //CONSTANTES-----------------------------------------------------------------------------------------------------------------
     define("SERVERNAME","localhost");
@@ -63,41 +66,6 @@
         $conn = null;
     }
    
-    /*Recibe los datos a introducir en la tabla almacena, abre la conexion con la BBDD y lo introduce  . */
-    function introducirCantProd($id_prod,$num_almacen,$cantidad)
-    {
-        try {
-            $conn = abrirConexion();
-            $id_producto = substr($id_prod,0,4);
-            $stmt = $conn->prepare("SELECT id_producto from producto where id_producto = '$id_producto' ");
-            $stmt->execute();
-            $stmt->setFetchMode(PDO::FETCH_ASSOC);
-            $resultado = $stmt->fetchAll();
-            if (!empty($resultado)) 
-            {
-                $conn->beginTransaction();
-                    $stmt = $conn->prepare("INSERT INTO Almacena (num_almacen,id_producto,cantidad) values  ('$num_almacen','$id_producto','$cantidad')");
-                    $stmt->execute();
-                $conn->commit();
-            }
-            else 
-            {
-                $conn->beginTransaction();
-                    $stmt = $conn->prepare("UPDATE Almacena set cantidad = cantidad + $cantidad where  id_producto = '$id_producto'");
-                    $stmt->execute();
-                $conn->commit();
-            }
-
-            $id_prod = substr($id_prod,7);
-            mensajeCantProd($num_almacen,$id_prod,$cantidad);
-
-        }   
-        catch(PDOException $e) {
-            erroresBBDD($e->getMessage());
-        }
-
-        cerrarConexion($conn);
-    }
     /*Recibe el nombre y el id del productoa listar de la tabla almacena, abre la conexion con la BBDD y lo imprime  . */
     function comprobarStock($nombre)
     {
@@ -264,7 +232,7 @@
         cerrarConexion($conn);
             
     }
-    function realizarCompraFinal($pago)
+    function realizarCompraFinal()
     {
         try {
             $conn = abrirConexion();
@@ -282,11 +250,7 @@
             
             $cliente = $_COOKIE["USERPASS"];
 
-            $conn->beginTransaction();
-                $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
-                                        values  ('$numOrder','$fecha_compra','$fecha_compra','In Process','$cliente')");
-                $stmt->execute();
-            $conn->commit();
+
 
             foreach ($cesta as $compra => $valor)
             {
@@ -327,20 +291,59 @@
                     mensajeNoCompraFinal($nombre,$cantidad,$cantidadCompra);
                 }
             }
-            $conn->beginTransaction();
-                $stmt = $conn->prepare("INSERT INTO payments (customerNumber,checkNumber,paymentDate,amount) 
-                                        values               ('$cliente','$pago','$fecha_compra','$montante')");
-                $stmt->execute();     
-            $conn->commit();
-
         }
         catch(PDOException $e) {
             echo $e->getMessage();
         }
 
         cerrarConexion($conn);
+        return $montante;
     }  
+    function guardarPago($codigo,$montante)
+    {
+        try {
+            $conn = abrirConexion();
+            $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
+            $stmt = $conn->prepare("SELECT max(orderNumber)+1 from orders ");
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $numOrder = $stmt->fetchAll();
+            $numOrder = $numOrder[0]['max(orderNumber)+1'];
+            $orderLine = 1;
+            
+            $montante = 0;
 
+            $fecha_compra = date("Y-m-d h:m:s");
+            
+            $cliente = $_COOKIE["USERPASS"];
+
+            if ($respuestaPago <= 99) {
+                $conn->beginTransaction();
+                    $stmt = $conn->prepare("INSERT INTO payments (customerNumber,checkNumber,paymentDate,amount) 
+                                            values               ('$cliente','','$fecha_compra','$montante')");
+                    $stmt->execute();     
+                    
+                    $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
+                                            values  ('$numOrder','$fecha_compra','$fecha_compra','In Process','$cliente')");
+                    $stmt->execute();
+                    boorarCesta();
+                $conn->commit();
+            }else {
+                $conn->beginTransaction();
+                    $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
+                                        values  ('$numOrder','$fecha_compra','$fecha_compra','PENDING PAY','$cliente')");
+                    $stmt->execute();
+                $conn->commit();
+                mensajeFaltaPago();
+            }
+    
+        }
+        catch(PDOException $e) {
+            echo $e->getMessage();
+        }
+        cerrarConexion($conn);
+
+    }
     function bloqueoUser($usuario)
     {
         try {
@@ -512,23 +515,8 @@
 
 
 <?php //IMPRESIÓN------------------------------------------------------------------------------------------------------------------
-    
-    function mensajeCat($nombre,$id_cat)
-    {
-        echo "Se ha introducido la Categoria $nombre con el codigo $id_cat";
-    }
-    function mensajeProd($nombre,$id_prod,$id_categoria)
-    {
-        echo "Se ha introducido el producto $nombre con el codigo: $id_prod en la categoria con código: $id_categoria ";
-    }
-    function mensajeAlm($localidad)
-    {
-        echo "Se ha introducido el almacen de la localidad $localidad ";
-    }
-    function mensajeCantProd($localidad,$id_producto,$cantidad)
-    {
-        echo "Se han introducido $cantidad unidades del producto: $id_producto en el almacen de la localidad $localidad ";
-    }
+
+
     function  imprimirCantidades($cantidad,$nombre)
     {
         echo "Hay $cantidad  unidades del producto: $nombre.<br>";
@@ -629,6 +617,10 @@
     function imprirmirListaPedido($orderLineNumber,$productName, $quantityOrdered , $priceEach)
     {
         echo "<tr><th>$orderLineNumber</th><td>$productName</td><td>$quantityOrdered</td><td>$priceEach</td></tr>";
+    }
+    function mensajeFaltaPago()
+    {
+        echo "NO SE HA PODIDO REALIZAR EL PAGO, EL PEDIDO ESTÁ PENDIENTE DE ESTE.";
     }
     //----------------------------------------
     function imprimirInicioCesta()

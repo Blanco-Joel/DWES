@@ -251,7 +251,10 @@
             $cliente = $_COOKIE["USERPASS"];
 
 
-
+            $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
+            values  ('$numOrder','$fecha_compra','$fecha_compra','In Process','$cliente')");
+            $stmt->execute();
+            
             foreach ($cesta as $compra => $valor)
             {
                 $nombre = $valor['nombre'];
@@ -299,8 +302,9 @@
         cerrarConexion($conn);
         return $montante;
     }  
-    function guardarPago($codigo,$montante)
+    function guardarPago($respuestaPago,$montante)
     {
+
         try {
             $conn = abrirConexion();
             $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
@@ -311,7 +315,6 @@
             $numOrder = $numOrder[0]['max(orderNumber)+1'];
             $orderLine = 1;
             
-            $montante = 0;
 
             $fecha_compra = date("Y-m-d h:m:s");
             
@@ -320,18 +323,16 @@
             if ($respuestaPago <= 99) {
                 $conn->beginTransaction();
                     $stmt = $conn->prepare("INSERT INTO payments (customerNumber,checkNumber,paymentDate,amount) 
-                                            values               ('$cliente','','$fecha_compra','$montante')");
+                                            values               ('$cliente','$numOrder','$fecha_compra','$montante')");
                     $stmt->execute();     
-                    
-                    $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
-                                            values  ('$numOrder','$fecha_compra','$fecha_compra','In Process','$cliente')");
-                    $stmt->execute();
+                    mensajePagado();
+
                     boorarCesta();
                 $conn->commit();
             }else {
                 $conn->beginTransaction();
                     $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
-                                        values  ('$numOrder','$fecha_compra','$fecha_compra','PENDING PAY','$cliente')");
+                                            values             ('$numOrder','$fecha_compra','$fecha_compra','PENDING PAY','$cliente')");
                     $stmt->execute();
                 $conn->commit();
                 mensajeFaltaPago();
@@ -398,6 +399,18 @@
             erroresBBDD($e->getMessage());
         }
         cerrarConexion($conn);
+    }
+
+    function recogerPedido()
+    {
+        $conn = abrirConexion();
+        $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
+        $stmt = $conn->prepare("SELECT max(orderNumber)+1 from orders ");
+        $stmt->execute();
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        $numOrder = $stmt->fetchAll();
+        $numOrder = $numOrder[0]['max(orderNumber)+1'];
+        return $numOrder;
     }
 ?>
 
@@ -606,7 +619,7 @@
     }
     function mensajeCompraFinal($nombre,$cantidadCompra)
     {
-        echo "Se ha realizado la compra al almacen de $cantidadCompra unidades del producto: $nombre. <br>";
+        echo "La compra al almacen de $cantidadCompra unidades del producto: $nombre está pendiente de pago. <br>";
     }
     function imprimirNumeroPedido($id,$fecha,$estado)
     {
@@ -617,6 +630,10 @@
     function imprirmirListaPedido($orderLineNumber,$productName, $quantityOrdered , $priceEach)
     {
         echo "<tr><th>$orderLineNumber</th><td>$productName</td><td>$quantityOrdered</td><td>$priceEach</td></tr>";
+    }
+    function mensajePagado()
+    {
+        echo "Se ha pagado la compra.";
     }
     function mensajeFaltaPago()
     {

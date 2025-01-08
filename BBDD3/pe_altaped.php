@@ -51,7 +51,7 @@
             }
             if (isset($_POST['comprarCest'])) 
             {
-                header("./pe_pago.php");
+                header("Location: pe_pago.php");
             }
             if (isset($_POST['borrarCest'])) 
             {

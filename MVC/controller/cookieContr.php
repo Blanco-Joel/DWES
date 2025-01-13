@@ -3,7 +3,6 @@
     function makecookie($datos)
     {    
         setcookie("USERPASS", $datos[0]['email'] , time() + (86400 * 30), "/"); // 86400 segundos = 1 día
-        header("Location: view/welcome.php");
     }
     //Comprueba la cookie en cada inicio de cada página.
     function comprobarCookie()
@@ -16,8 +15,9 @@
     function borrarCookie()     
     {
         if(isset($_COOKIE["USERPASS"])) {
+            
             setcookie("USERPASS", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
-            header("Location: ./pe_login.php");
+            header("Location: view/login.php");
         }
 
     }

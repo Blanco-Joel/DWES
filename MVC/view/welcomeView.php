@@ -34,7 +34,7 @@
 		
 		
 		
-		  <BR><a href="">Cerrar Sesión</a>
+		  <BR><a href="login.php">Cerrar Sesión</a>
 	</div>  
 	  
 	  

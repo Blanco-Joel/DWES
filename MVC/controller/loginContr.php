@@ -9,9 +9,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $clave = recogerDatos("password");
     
     $datos = getData($email,$clave);
-    var_dump($datos[0]['email']);
-    makeCookie($datos);    
-
+    if (!empty($datos)) {
+        makeCookie($datos);    
+    }
 }
 
 

@@ -9,7 +9,7 @@
     function comprobarCookie()
     {    
         if(!isset($_COOKIE["USERPASS"])) {
-            header("Location: ./login.php");
+            header("Location: view/login.php");
         }
     }
     //Elimina la cookie.

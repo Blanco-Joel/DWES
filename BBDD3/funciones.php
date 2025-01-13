@@ -254,7 +254,7 @@
             $stmt = $conn->prepare("INSERT INTO orders (orderNumber,orderDate,requiredDate,status,customerNumber) 
             values  ('$numOrder','$fecha_compra','$fecha_compra','In Process','$cliente')");
             $stmt->execute();
-            
+
             foreach ($cesta as $compra => $valor)
             {
                 $nombre = $valor['nombre'];
@@ -308,11 +308,11 @@
         try {
             $conn = abrirConexion();
             $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
-            $stmt = $conn->prepare("SELECT max(orderNumber)+1 from orders ");
+            $stmt = $conn->prepare("SELECT max(orderNumber) from orders ");
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $numOrder = $stmt->fetchAll();
-            $numOrder = $numOrder[0]['max(orderNumber)+1'];
+            $numOrder = $numOrder[0]['max(orderNumber)'];
             $orderLine = 1;
             
 
@@ -405,11 +405,11 @@
     {
         $conn = abrirConexion();
         $cesta = isset($_COOKIE["cesta"]) ? unserialize($_COOKIE["cesta"]) : array();
-        $stmt = $conn->prepare("SELECT max(orderNumber)+1 from orders ");
+        $stmt = $conn->prepare("SELECT max(orderNumber) from orders ");
         $stmt->execute();
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $numOrder = $stmt->fetchAll();
-        $numOrder = $numOrder[0]['max(orderNumber)+1'];
+        $numOrder = $numOrder[0]['max(orderNumber)'];
         return $numOrder;
     }
 ?>

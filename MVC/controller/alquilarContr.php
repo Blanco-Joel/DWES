@@ -3,6 +3,7 @@ require_once ("cookieContr.php");
     compCookie();
 require_once ("../model/alquilarModel.php");
     $datos = getVehicles();
+
     $cart = "";
     $message = "";
     if (isset($_POST["agregar"]) && isset($_COOKIE["CART"]) && count(unserialize($_COOKIE["CART"])) == 3) {

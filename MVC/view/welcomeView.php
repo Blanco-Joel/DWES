@@ -29,7 +29,7 @@ require_once ("../controller/cookieContr.php");
        <!--Formulario con botones -->
 	
 		<input type="button" value="Alquilar Vehículo" onclick="window.location.href='alquilarContr.php'" class="btn btn-warning disabled">
-		<input type="button" value="Consultar Alquileres" onclick="window.location.href=''" class="btn btn-warning disabled">
+		<input type="button" value="Consultar Alquileres" onclick="window.location.href='consultarContr.php'" class="btn btn-warning disabled">
 		<input type="button" value="Devolver Vehículo" onclick="window.location.href=''" class="btn btn-warning disabled">
 		</br></br>
 		

@@ -1,6 +1,6 @@
 <?php
-require_once ("view/loginView.php");
 require_once ("dataContr.php");
+require_once ("view/loginView.php");
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email = recogerDatos("email");
@@ -14,9 +14,10 @@ require_once ("cookieContr.php");
             header("Location: controller/welcomeContr.php");
         }
         else {
-            # error.
+            echo "ERROR DE INICIO SESIÓN";
         }
 }
+
 
 
 ?>

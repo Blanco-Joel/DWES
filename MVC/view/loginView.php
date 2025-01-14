@@ -23,7 +23,6 @@
 		<div class="form-group">
 			Clave <input type="password" name="password" placeholder="password" class="form-control">
         </div>				
-        
 		<input type="submit" name="submit" value="Login" class="btn btn-warning disabled">
         </form>
 		

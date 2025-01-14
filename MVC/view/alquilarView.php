@@ -1,7 +1,3 @@
-<?php
-    require_once ("selectsContr.php");
-
-?>
 <html>
    
  <head>
@@ -33,12 +29,20 @@
 			<B>Matricula/Marca/Modelo: </B><select name="vehiculos" class="form-control">
 
 			<?php
-					foreach ($datos as $vehicle => $dato) 
-						echo "<option value='" . $dato['matricula'] . "'>" . $dato['visual'] . "</option>";
-					
-					?>
+				foreach ($datos as $vehicle => $dato) 
+					echo "<option value='" . $dato['matricula'] . "'>" . $dato['visual'] . "</option>";
+			?>
 			</select>
-			
+			<?php
+			if (!empty($cart) ) {
+				echo "<b>cesta</b><br>";
+				foreach ($cart as $vehicle) {
+					echo $vehicle."<br>";
+				}
+			}
+			echo "<BR>";
+			echo $message;
+			?>
 		
 		<BR> <BR><BR><BR><BR><BR>
 		<div>
@@ -47,8 +51,9 @@
 			<input type="submit" value="Vaciar Cesta" name="vaciar" class="btn btn-warning disabled">
 		</div>		
 	</form>
+	<BR><a href="../controller/logoutContr.php">Cerrar Sesión</a>
+
 	<!-- FIN DEL FORMULARIO -->
   </body>
    
 </html>
-

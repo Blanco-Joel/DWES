@@ -1,5 +1,5 @@
 <?php
-    require_once 'bbdd/connect.php';
+require_once 'bbdd/connect.php';
 
 	function getData($email,$clave) {
 

@@ -23,9 +23,20 @@
         if(isset($_COOKIE["USERPASS"])) {
             setcookie("NAME", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
             setcookie("USERPASS", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+            if(isset($_COOKIE["CART"])) {
+                setcookie("CART", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+
+            }
             header("Location: ../index.php");
         }
 
+    }
+    function deleteCart()
+    {
+        if(isset($_COOKIE["CART"])) 
+            setcookie("CART", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+
+        
     }
 
  

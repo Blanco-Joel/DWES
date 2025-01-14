@@ -14,7 +14,6 @@
 
         return $conn;
     }
-
     /*Cierra la conexión con la base de datos. */
     function closeConn(&$conn)
     {

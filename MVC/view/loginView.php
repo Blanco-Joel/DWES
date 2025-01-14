@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login Page - MovilMad</title>
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
  </head>
       
 <body>
@@ -15,7 +15,7 @@
 		<div class="card-header">Login Usuario</div>
 		<div class="card-body">
 		
-		<form id="" name="" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post" class="card-body">
+		<form id="" name="" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ;?>" method="post" class="card-body">
 		
 		<div class="form-group">
 			Email <input type="text" name="email" placeholder="email" class="form-control">

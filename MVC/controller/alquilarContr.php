@@ -1,6 +1,6 @@
 <?php
 require_once ("cookieContr.php");
-    compCookie();
+compCookie();
 require_once ("../model/alquilarModel.php");
     $datos = getVehicles();
 
@@ -41,6 +41,8 @@ require_once ("../model/alquilarModel.php");
         }
         if (isset($_POST["vaciar"]))
             deleteCart();
+        if (isset($_POST["Volver"]))
+            header("Location: ../controller/welcomeContr.php");
         
             
     }

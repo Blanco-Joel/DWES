@@ -30,13 +30,20 @@
 			 Fecha Hasta: <input type='date' name='fechahasta' value='' size=10 placeholder="fechahasta" class="form-control"><br><br>
 				
 		<div>
-			<input type="submit" value="Consultar" name="Volver" class="btn btn-warning disabled">
+			<input type="submit" value="Consultar" name="Consultar" class="btn btn-warning disabled">
 		
 			<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
-		
+
 		</div>		
 	</form>
 	<!-- FIN DEL FORMULARIO -->
+   <?php
+      if (!empty($rentedVehicles) ) {
+        foreach ($rentedVehicles as $vehicle) {
+          echo $vehicle["linea"]."<br><br>";
+        }
+      }
+   ?>
     <BR><a href="../controller/logoutContr.php">Cerrar Sesión</a>
 
   </body>

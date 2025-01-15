@@ -17,41 +17,38 @@
 		closeConn($connection);
 
 	}
-	function insertRalquileres($veh,$client,$date) {
+	function getPrice($vehicle) {
 
 		$connection = openConn();
 		try {
-			$connection->beginTransaction();
-				$insert = $connection->prepare("INSERT INTO `ralquileres` (`idcliente`, `matricula`, `fecha_alquiler`, `fecha_devolucion`, `preciototal`, `fechahorapago`) 
-													VALUES ('$client', '$veh', '$date', NULL, NULL, NULL);");
-				$insert->execute();
-			$connection->commit();
+			$obtainInfo = $connection->prepare("SELECT ROUND((TIMESTAMPDIFF(MINUTE,fecha_alquiler , NOW())*preciobase),2) as amount from ralquileres,rvehiculos where ralquileres.matricula = rvehiculos.matricula and ralquileres.matricula = '$vehicle' AND fecha_devolucion IS NULL ");
+			$obtainInfo->execute();
+			return $obtainInfo->fetchAll(PDO::FETCH_ASSOC); 
 
 		} catch (PDOException $ex) {
 			echo $ex->getMessage();
+			return null;
 		}
 		
 		closeConn($connection);
 
-	}	
-
-	function updateRvehiculos($veh) {
+	}
+	function getPayOrder() {
 
 		$connection = openConn();
 		try {
-			$connection->beginTransaction();
-				$update = $connection->prepare("UPDATE rvehiculos SET disponible = 'N' where matricula =
-				 '$veh'");
-
-				$update->execute();
-			$connection->commit();
-
-
+			$obtainInfo = $connection->prepare("SELECT max(NUM_PAGO)+1 AS NUM FROM RALQUILERES");
+			$obtainInfo->execute();
+			$number = $obtainInfo->fetchAll(PDO::FETCH_ASSOC); 
+			return $number[0]['NUM'];
 		} catch (PDOException $ex) {
 			echo $ex->getMessage();
+			return null;
 		}
-
+		
 		closeConn($connection);
 
 	}
+
+
 ?>

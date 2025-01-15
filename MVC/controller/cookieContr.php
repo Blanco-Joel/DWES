@@ -42,6 +42,13 @@
 
         
     }
+    function deleteVehicle()
+    {
+        if(isset($_COOKIE["VEHICLE"])) 
+            setcookie("VEHICLE", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+
+        
+    }
 
  
  ?>

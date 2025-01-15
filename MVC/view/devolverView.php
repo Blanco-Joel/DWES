@@ -31,6 +31,10 @@
         ?>
       </select>
 		<BR><BR>
+    <?php
+      if (!empty($message)) 
+      echo $message;
+    ?>
 		<div>
 			<input type="submit" value="Devolver Vehiculo" name="devolver" class="btn btn-warning disabled">
 			<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
@@ -38,6 +42,7 @@
     
 	</form>
   <?php
+  
   if (!empty($button)) 
       echo $button;
   

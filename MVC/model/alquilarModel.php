@@ -39,8 +39,8 @@
 		$connection = openConn();
 		try {
 			$connection->beginTransaction();
-				$insert = $connection->prepare("INSERT INTO `ralquileres` (`idcliente`, `matricula`, `fecha_alquiler`, `fecha_devolucion`, `preciototal`, `fechahorapago`) 
-													VALUES ('$client', '$veh', '$date', NULL, NULL, NULL);");
+				$insert = $connection->prepare("INSERT INTO `ralquileres` (`idcliente`, `matricula`, `fecha_alquiler`, `fecha_devolucion`, `preciototal`, `fechahorapago`,`num_pago`) 
+													VALUES ('$client', '$veh', '$date', NULL, NULL, NULL,0);");
 				$insert->execute();
 			$connection->commit();
 

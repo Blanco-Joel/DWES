@@ -29,7 +29,7 @@ require_once ("../model/alquilarModel.php");
             }else
             {
                 $client = $_COOKIE['USERPASS'];
-                $date = date("Y-m-d h:i:s", strtotime("+1 hour"));
+                $date = date("Y-m-d H:i:s", strtotime("+1 hour"));
                 foreach ($cart as $vehicle => $veh) {
                     insertRalquileres($veh,$client,$date);
                     updateRvehiculos($veh);

@@ -26,15 +26,23 @@
     <B>Identificador Cliente: </B> <?php echo $_COOKIE["USERPASS"]  ?>  <BR><BR>
 				
 			<B>Matricula/Marca/Modelo: </B><select name="vehiculos" class="form-control">
-				
-			</select>
+        <?php foreach ($data as $vehicle => $veh) 
+          echo "<option value='" . $veh['matricula'] . "'>" . $veh['visual'] . "</option>";
+        ?>
+      </select>
 		<BR><BR>
 		<div>
 			<input type="submit" value="Devolver Vehiculo" name="devolver" class="btn btn-warning disabled">
 			<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
 		</div>		
+    
 	</form>
-	<!-- FIN DEL FORMULARIO -->
+  <?php
+  if (!empty($button)) 
+      echo $button;
+  
+  ?>
+  <!-- FIN DEL FORMULARIO -->
     <BR><a href="../controller/logoutContr.php">Cerrar Sesión</a>
 	
   </body>

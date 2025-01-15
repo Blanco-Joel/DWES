@@ -1,30 +1,13 @@
 <?php
 	require_once '../bbdd/connect.php';
 
-	function getVehicles() {
+	function getRentedVehicles($idClient) {
 
 		$connection = openConn();
 		try {
-			$obtenerInfo = $connection->prepare("select matricula, concat(marca, ' ' , modelo ,' (',matricula,') | KMs : ' , kms) as visual from rvehiculos where disponible = 'S';");
-			$obtenerInfo->execute();
-			return $obtenerInfo->fetchAll(PDO::FETCH_ASSOC); 
-
-		} catch (PDOException $ex) {
-			echo $ex->getMessage();
-			return null;
-		}
-		
-		closeConn($connection);
-
-	}
-	function getVehiclesClient() {
-
-		$connection = openConn();
-		try {
-			$client = $_COOKIE['USERPASS'];
-			$obtenerInfo = $connection->prepare("select COUNT(matricula) as matricula from ralquileres where idCliente = '$client' and fecha_devolucion IS NULL ;");
-			$obtenerInfo->execute();
-			return $obtenerInfo->fetchAll(PDO::FETCH_ASSOC); 
+			$obtainInfo = $connection->prepare("SELECT ralquileres.matricula, concat(marca, ' ' , modelo ,' (',ralquileres.matricula,')') as visual from ralquileres,rvehiculos where ralquileres.matricula = rvehiculos.matricula and idCliente = '$idClient' and fecha_devolucion IS NULL;");
+			$obtainInfo->execute();
+			return $obtainInfo->fetchAll(PDO::FETCH_ASSOC); 
 
 		} catch (PDOException $ex) {
 			echo $ex->getMessage();

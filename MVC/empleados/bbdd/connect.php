@@ -2,7 +2,7 @@
     define("SERVERNAME","localhost");
     define("USERNAME","root");
     define("PASSWORD","rootroot");
-    define("DBNAME","movilmad");
+    define("DBNAME","employees");
 ?>
 
 <?php

@@ -33,71 +33,65 @@
 		closeConn($connection);
 
 	}
-	
+	function insertAll($lastNum,$employee)
+	{
+		$connection = openConn();
+			
+			$connection->beginTransaction();
+				insertEmpl($lastNum,$employee["birth_date"],$employee["first_name"],$employee["last_name"],$employee["gender"]);
+				insertEmplDpt($lastNum,$employee["dpt"]);
+				insertEmplTitle($lastNum,$employee["title"]);
+				insertEmplSalary($lastNum,$employee["salary"]);
+			$connection->commit();
+
+		closeConn($connection);
+
+	}
+
+
 	function insertEmpl($lastNum,$birth_date,$first_name,$last_name,$gender) {
 
-		$connection = openConn();
 		try {
-			$connection->beginTransaction();
-				$insert = $connection->prepare("INSERT INTO `employees` (`emp_no`, `birth_date`, `first_name`, `last_name`, `gender`, `hire_date`) VALUES ('$lastNum', '$birth_date', '$first_name', '$last_name', '$gender', DATE(NOW()));");
-				$insert->execute();
-			$connection->commit();
+			$insert = $connection->prepare("INSERT INTO `employees` (`emp_no`, `birth_date`, `first_name`, `last_name`, `gender`, `hire_date`) VALUES ('$lastNum', '$birth_date', '$first_name', '$last_name', '$gender', DATE(NOW()));");
+			$insert->execute();
 
 		} catch (PDOException $ex) {
 			echo $ex->getMessage();
 		}
 		
-		closeConn($connection);
 
 	}	
 
-	function insertEmplDpt($lastNum,$dpt) {
-
-		$connection = openConn();
+	function insertEmplDpt($lastNum,$dpt) 
+	{
 		try {
-			$connection->beginTransaction();
-				$insert = $connection->prepare("INSERT INTO `dept_emp` (`emp_no`, `dept_no`, `from_date`, `to_date`) VALUES ('$lastNum', '$dpt', DATE(NOW()), NULL);");
-				$insert->execute();
-			$connection->commit();
+			$insert = $connection->prepare("INSERT INTO `dept_emp` (`emp_no`, `dept_no`, `from_date`, `to_date`) VALUES ('$lastNum', '$dpt', DATE(NOW()), NULL);");
+			$insert->execute();
 
 		} catch (PDOException $ex) {
 			echo $ex->getMessage();
 		}
-		
-		closeConn($connection);
-
 	}	
-	function insertEmplTitle($lastNum,$title) {
-
-		$connection = openConn();
+	function insertEmplTitle($lastNum,$title)
+	{
 		try {
-			$connection->beginTransaction();
-				$insert = $connection->prepare("INSERT INTO `titles` (`emp_no`, `title`, `from_date`, `to_date`) VALUES ('$lastNum', '$title', DATE(NOW()), NULL);");
-				$insert->execute();
-			$connection->commit();
+			$insert = $connection->prepare("INSERT INTO `titles` (`emp_no`, `title`, `from_date`, `to_date`) VALUES ('$lastNum', '$title', DATE(NOW()), NULL);");
+			$insert->execute();
 
 		} catch (PDOException $ex) {
 			echo $ex->getMessage();
 		}
-		
-		closeConn($connection);
-
 	}	
-	function insertEmplSalary($lastNum,$salary) {
 
-		$connection = openConn();
+	function insertEmplSalary($lastNum,$salary) 
+	{
 		try {
-			$connection->beginTransaction();
-				$insert = $connection->prepare("INSERT INTO `salaries` (`emp_no`, `salary`, `from_date`, `to_date`) VALUES ('$lastNum', '$salary', DATE(NOW()), NULL);");
-				$insert->execute();
-			$connection->commit();
+			$insert = $connection->prepare("INSERT INTO `salaries` (`emp_no`, `salary`, `from_date`, `to_date`) VALUES ('$lastNum', '$salary', DATE(NOW()), NULL);");
+			$insert->execute();
 
 		} catch (PDOException $ex) {
 			echo $ex->getMessage();
 		}
-		
-		closeConn($connection);
-
 	}	
 
 ?>

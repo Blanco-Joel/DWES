@@ -13,13 +13,19 @@ require_once ("../model/altaEmplModel.php");
             $first_name= recogerDatos("first_name");
             $last_name= recogerDatos("last_name");
             $gender= recogerDatos("gender");
-            insertEmpl($lastNum,$birth_date,$first_name,$last_name,$gender);
             $dpt= recogerDatos("dpt");
-            insertEmplDpt($lastNum,$dpt);
             $title= recogerDatos("title");
-            insertEmplTitle($lastNum,$title);
             $salary= recogerDatos("salary");
-            insertEmplSalary($lastNum,$salary);
+            $employee = [
+                'birth_date' => $birth_date,
+                'first_name' => $first_name,
+                'last_name'  => $last_name,
+                'gender'     => $gender,
+                'dpt'        => $dpt,
+                'title'      => $title,
+                'salary'     => $salary
+            ];
+            insertAll($lastNum,$employee);
         }
     }    
     

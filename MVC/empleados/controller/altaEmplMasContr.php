@@ -39,10 +39,7 @@ require_once ("../model/altaEmplModel.php");
                 $mess = "";
                 foreach ($datas as $employee) {
                     $lastNum = getLastNo();
-                    insertEmpl($lastNum,$employee["birth_date"],$employee["first_name"],$employee["last_name"],$employee["gender"]);
-                    insertEmplDpt($lastNum,$employee["dpt"]);
-                    insertEmplTitle($lastNum,$employee["title"]);
-                    insertEmplSalary($lastNum,$employee["salary"]);
+                    insertAll($lastNum,$employee);
                     $mess .=  "Se ha añadido al empleado con nombre " . $employee["first_name"] . " " . $employee["last_name"] .".<br><br>" ; 
                 }
                 deleteEmp();

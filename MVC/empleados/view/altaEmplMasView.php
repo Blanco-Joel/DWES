@@ -59,6 +59,11 @@ require_once ("../controller/cookieContr.php");
 				
 			</fieldset>
 			<br>
+			<?php
+			if (!empty($mess)) {
+				echo $mess;
+			}
+			?>
 			<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
 		</form>
 		

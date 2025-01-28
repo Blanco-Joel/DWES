@@ -24,13 +24,14 @@
     //Elimina la cookie.
     function deleteCookie()     
     {
-        if(isset($_COOKIE["USERPASS"])) {
+        if(isset($_COOKIE["USERPASS"])) 
+        {
             setcookie("NAME", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
             setcookie("USERPASS", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
-            if(isset($_COOKIE["EMPLOYEES"])) {
+            if(isset($_COOKIE["EMPLOYEES"])) 
                 setcookie("EMPLOYEES", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
-
-            }
+            if(isset($_COOKIE["salarEmployee"])) 
+                setcookie("salarEmployee", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
             header("Location: ../index.php");
         }
 
@@ -39,7 +40,8 @@
     {
         if(isset($_COOKIE["EMPLOYEES"])) 
             setcookie("EMPLOYEES", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
-
+        if(isset($_COOKIE["salarEmployee"])) 
+            setcookie("salarEmployee", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
         
     }
 

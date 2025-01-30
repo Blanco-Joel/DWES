@@ -27,7 +27,10 @@ $data = getEmployees();
             deleteEmp();
         }
         if (isset($_POST["Volver"]))
+        {
             header("Location: ../controller/welcomeRRHHContr.php");
+            deleteEmp();
+        }
         
     }
 require_once ("../view/modifSalarView.php");

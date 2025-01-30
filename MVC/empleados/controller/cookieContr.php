@@ -41,6 +41,10 @@
                 setcookie("EMPLOYEES", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
             if(isset($_COOKIE["salarEmployee"])) 
                 setcookie("salarEmployee", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+            if(isset($_COOKIE["deptEmployee"])) 
+                setcookie("deptEmployee", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+            if(isset($_COOKIE["deptManager"])) 
+                setcookie("deptManager", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
             header("Location: ../index.php");
         }
 
@@ -51,9 +55,10 @@
             setcookie("EMPLOYEES", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
         if(isset($_COOKIE["salarEmployee"])) 
             setcookie("salarEmployee", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+        if(isset($_COOKIE["deptEmployee"])) 
+            setcookie("deptEmployee", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
         if(isset($_COOKIE["deptManager"])) 
             setcookie("deptManager", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
-        
     }
 
 

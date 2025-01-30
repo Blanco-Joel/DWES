@@ -1,6 +1,8 @@
 <?php
 require_once ("cookieContr.php");
 compCookie();
+compCookieRRHH();
+
 require_once ("../model/modifSalarModel.php");
 
 $data = getEmployees();

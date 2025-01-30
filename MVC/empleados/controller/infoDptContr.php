@@ -1,6 +1,7 @@
 <?php
 require_once ("cookieContr.php");
 compCookie();
+compCookieRRHH();
 require_once ("../model/infoDptModel.php");
 
 $data = getDpt();

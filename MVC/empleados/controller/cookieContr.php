@@ -7,7 +7,7 @@
     //Comprueba la cookie en cada inicio de cada página.
     function compCookie()
     {    
-        if(!isset($_COOKIE["USERPASS"]) || !isset($_COOKIE["NAME"]|| !isset($_COOKIE["DEPT"])))
+        if(!isset($_COOKIE["USERPASS"]) || !isset($_COOKIE["NAME"]) || !isset($_COOKIE["DEPT"]))
         {
             setcookie("NAME", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
             setcookie("USERPASS", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
@@ -18,10 +18,8 @@
     }
     function compCookieRRHH()
     {    
-        if(($_COOKIE["DEPT"]) == "d003")
-            header("Location: ../welcomeRRHHContr.php");
-        else
-            header("Location: ../welcomeContr.php");
+        if(($_COOKIE["DEPT"]) != "d003")
+            header("Location: ../controller/welcomeContr.php");
         
     }
     function compCookieIndex()

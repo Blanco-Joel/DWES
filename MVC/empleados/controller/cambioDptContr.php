@@ -13,15 +13,20 @@ $data = getEmployees();
             if (!empty($employee)) {
                 makecookie("deptEmployee",$employee);
                 $department = getDepartment($employee);
-                $actualDepart = "<label for='actual'>Actual Department of " . $department['first_name']." " . $department['last_name'] . " :</label><input class='form-control' value='". $department['dept_no']."' placeholder='".$department['dept_no']."'  type='text' id='actual' name='actual'>";
+                $restDepart = getDepartmentAll($employee);
+                $actualDepart = "<label for='actual'>Actual Department of " . $department['first_name']." " . $department['last_name'] . " : " .$department['dept_name']."</label><select name='actual' id='actual' class='form-control'>";
+                foreach ($restDepart as $d ) {
+                    $actualDepart .="<option value='" . $d['dept_no'] . "'>" . $d['dept_name'] . "</option>";
+                }
+                $actualDepart .= "</select>";
                 $button = "<input type='submit' value='Cambiar Departamento' name='cambiar' class='btn btn-warning disabled'>";
             }
         }
         if (isset($_POST["cambiar"]))
         {
-            $sal = recogerDatos("actual");
-            $employee = $_COOKIE["salarEmployee"];
-            updateDepartment($employee,$sal);
+            $dept = recogerDatos("actual");
+            $employee = $_COOKIE["deptEmployee"];
+            updateDepartment($employee,$dept);
             deleteEmp();
         }
         

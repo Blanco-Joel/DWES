@@ -16,6 +16,7 @@ require_once ("view/loginView.php");
             makeCookie("USERPASS",$datos[0]['emp_no']);    
             makeCookie("NAME",$datos[0]['nombre']);    
             $dept = getDept($user);
+            makeCookie("DEPT",$dept);    
             if ($dept == "d003") {
                 header("Location: controller/welcomeRRHHContr.php");
             }else

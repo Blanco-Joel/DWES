@@ -34,7 +34,7 @@ require_once ("../controller/cookieContr.php");
 		<input type="button" value="Vida laboral" onclick="window.location.href='vidaLaboralContr.php'" class="btn btn-warning disabled">
 		<input type="button" value="Info del departamento" onclick="window.location.href='infoDptContr.php'" class="btn btn-warning disabled"><br><br>
 		<input type="button" value="Cambio de departamento" onclick="window.location.href='cambioDptContr.php'" class="btn btn-warning disabled">
-		<input type="button" value="Cambio de jefe de departamento" onclick="window.location.href='devolverContr.php'" class="btn btn-warning disabled"><br><br>
+		<input type="button" value="Cambio de jefe de departamento" onclick="window.location.href='cambioJefDptContr.php'" class="btn btn-warning disabled"><br><br>
 		<input type="button" value="Baja de empleado" onclick="window.location.href='devolverContr.php'" class="btn btn-warning disabled">
 		<input type="button" value="Mi nómina" onclick="window.location.href='devolverContr.php'" class="btn btn-warning disabled">
 		<input type="button" value="Historial laboral" onclick="window.location.href='devolverContr.php'" class="btn btn-warning disabled">

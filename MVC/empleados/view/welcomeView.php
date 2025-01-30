@@ -28,8 +28,8 @@ require_once ("../controller/cookieContr.php");
 		
        <!--Formulario con botones -->
 	
-		<input type="button" value="Mi nómina" onclick="window.location.href='devolverContr.php'" class="btn btn-warning disabled">
-		<input type="button" value="Historial laboral" onclick="window.location.href='devolverContr.php'" class="btn btn-warning disabled">
+		<input type="button" value="Mi nómina" onclick="window.location.href='nominaContr.php'" class="btn btn-warning disabled">
+		<input type="button" value="Historial laboral" onclick="window.location.href='histLaboralContr.php'" class="btn btn-warning disabled">
 	</br></br>
 		
 		

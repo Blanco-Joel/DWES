@@ -6,7 +6,7 @@ require_once 'bbdd/connect.php';
 		$connection = openConn();
 
 		try {
-			$obtainInfo = $connection->prepare("select emp_no,Last_name,concat(first_name, ' ' , Last_name) nombre from employees where last_name = '$clave' and emp_no = '$user';");
+			$obtainInfo = $connection->prepare("select emp_no,Last_name,concat(first_name, ' ' , Last_name) nombre from employees where last_name = '$clave' and emp_no = '$user' and baja is NULL;");
 			$obtainInfo->execute();
 			return $obtainInfo->fetchAll(PDO::FETCH_ASSOC); 
 

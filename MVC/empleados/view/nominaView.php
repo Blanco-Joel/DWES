@@ -28,6 +28,13 @@
     
          
     <?php
+        if (!empty($employeeData)) {
+          echo $messPdata;
+          foreach ($employeeData as $emp ) {
+              echo $emp["visual"];
+          }
+          
+        }
         if (!empty($employeeDpt)) {
           echo $messDept;
           foreach ($employeeDpt as $emp ) {
@@ -38,29 +45,15 @@
               echo $managerMess;
           }
         }
-        if (!empty($employeeSal)) {
-          echo $messSalar;
-          foreach ($employeeSal as $emp ) {
-              echo $emp["visual"];
-          }
-          
-        }
-        if (!empty($employeeData)) {
-          echo $messPdata;
-          foreach ($employeeData as $emp ) {
-              echo $emp["visual"];
-          }
-          
-        }
         if (!empty($employeeTitle)) {
           echo $messTitl;
           foreach ($employeeTitle as $emp ) {
               echo $emp["visual"];
           }
         }
+        echo $messSalar;
         ?><BR>
 		<div>
-			<input type="submit" value="Consultar Vida Laboral " name="Consultar" class="btn btn-warning disabled">
 			<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
 
 		</div>		

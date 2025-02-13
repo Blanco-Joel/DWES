@@ -38,10 +38,10 @@
 		$connection = openConn();
 			
 			$connection->beginTransaction();
-				insertEmpl($lastNum,$employee["birth_date"],$employee["first_name"],$employee["last_name"],$employee["gender"]);
-				insertEmplDpt($lastNum,$employee["dpt"]);
-				insertEmplTitle($lastNum,$employee["title"]);
-				insertEmplSalary($lastNum,$employee["salary"]);
+				insertEmpl($connection,$lastNum,$employee["birth_date"],$employee["first_name"],$employee["last_name"],$employee["gender"]);
+				insertEmplDpt($connection,$lastNum,$employee["dpt"]);
+				insertEmplTitle($connection,$lastNum,$employee["title"]);
+				insertEmplSalary($connection,$lastNum,$employee["salary"]);
 			$connection->commit();
 
 		closeConn($connection);
@@ -49,7 +49,8 @@
 	}
 
 
-	function insertEmpl($lastNum,$birth_date,$first_name,$last_name,$gender) {
+	function insertEmpl($connection,$lastNum,$birth_date,$first_name,$last_name,$gender) {
+
 
 		try {
 			$insert = $connection->prepare("INSERT INTO `employees` (`emp_no`, `birth_date`, `first_name`, `last_name`, `gender`, `hire_date`) VALUES ('$lastNum', '$birth_date', '$first_name', '$last_name', '$gender', DATE(NOW()));");
@@ -62,7 +63,7 @@
 
 	}	
 
-	function insertEmplDpt($lastNum,$dpt) 
+	function insertEmplDpt($connection,$lastNum,$dpt) 
 	{
 		try {
 			$insert = $connection->prepare("INSERT INTO `dept_emp` (`emp_no`, `dept_no`, `from_date`, `to_date`) VALUES ('$lastNum', '$dpt', DATE(NOW()), NULL);");
@@ -72,7 +73,7 @@
 			echo $ex->getMessage();
 		}
 	}	
-	function insertEmplTitle($lastNum,$title)
+	function insertEmplTitle($connection,$lastNum,$title)
 	{
 		try {
 			$insert = $connection->prepare("INSERT INTO `titles` (`emp_no`, `title`, `from_date`, `to_date`) VALUES ('$lastNum', '$title', DATE(NOW()), NULL);");
@@ -83,7 +84,7 @@
 		}
 	}	
 
-	function insertEmplSalary($lastNum,$salary) 
+	function insertEmplSalary($connection,$lastNum,$salary) 
 	{
 		try {
 			$insert = $connection->prepare("INSERT INTO `salaries` (`emp_no`, `salary`, `from_date`, `to_date`) VALUES ('$lastNum', '$salary', DATE(NOW()), NULL);");

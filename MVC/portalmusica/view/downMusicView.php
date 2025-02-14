@@ -21,44 +21,48 @@ require_once ("../controller/cookieContr.php");
 		<div class="card-header">User menu </div>
 		<div class="card-body">
 
-
-		<B>Welcome: </B> <?php echo $_COOKIE["NAME"]  ?>   <BR><BR>
-		<B>Client id: </B> <?php echo $_COOKIE["USERPASS"]  ?>  <BR><BR>
-	 
+			<B>Welcome: </B> <?php echo $_COOKIE["NAME"]  ?>   <BR><BR>
+			<B>Client id: </B> <?php echo $_COOKIE["USERPASS"]  ?>  <BR><BR>
+			
+		<form method="POST" action="">
 			<B>Songs: </B><select name="songs" class="form-control">
 
 			<?php
 				foreach ($data as $songs => $dt) 
-					echo "<option value='" . $dt['name'] . "'>" . $dt['visual'] . "</option>";
+					echo "<option value='" . $dt['trackid'] . "'>" . $dt['visual'] . "</option>";
 			?>
 			</select>
+
+			<div style="padding-top:1rem;display: flex;justify-content:center">
+				<input style="margin-right:1rem" type="submit" value="<" name="prev" class="btn btn-warning disabled">
+				<input type="submit" value=">" name="next" class="btn btn-warning disabled">
+			</div>
 			<?php
-			if (!empty($song) ) {
+			if (isset($_SESSION["SONGS"]) ) {
 				echo "<b>cesta</b><br>";
-				foreach ($cart as $vehicle) {
-					echo $vehicle."<br>";
+				foreach ($_SESSION["SONGS"] as $songSelected => $times) {
+					echo  $songSelected ." times listened: " . $times. "<br>";
 				}
 			}
-			if (!empty($cart) ) {
-				echo "<b>cesta</b><br>";
-				foreach ($cart as $song) {
-					echo $song."<br>";
-				}
-			}
+
 			echo "<BR>";
 			if (!empty($mess)) {
 				echo $mess;
 			}
 			?>
 		
-		<BR> <BR><BR><BR><BR><BR>
-		<div>
-			<input type="submit" value="Agregar a Cesta" name="annadir" class="btn btn-warning disabled">
-			<input type="submit" value="Realizar Alquiler" name="buy" class="btn btn-warning disabled">
-			<input type="submit" value="Vaciar Cesta" name="vaciar" class="btn btn-warning disabled">
-			<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
-		</div>		
-	</form>
+			<BR> <BR><BR><BR><BR><BR>
+			<div>
+				<input type="submit" value="Agregar a Cesta" name="annadir" class="btn btn-warning disabled">
+				<input type="submit" value="Realizar Alquiler" name="buy" class="btn btn-warning disabled">
+				<input type="submit" value="Vaciar Cesta" name="clear" class="btn btn-warning disabled">
+				<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
+				<?php
+				  if (!empty($button)) 
+				  	echo $button;
+				?>
+			</div>		
+		</form>
 	<BR><a href="../controller/logoutContr.php">Cerrar Sesión</a>
 
 	<!-- FIN DEL FORMULARIO -->

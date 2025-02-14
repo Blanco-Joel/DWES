@@ -13,8 +13,6 @@ compCookie();
                     require_once ("../model/consultarModel.php");
                     $idClient = $_COOKIE["USERPASS"];
                     $rentedVehicles = getRented($idClient,$firstDate,$secondDate);
-                    
-                    
                 }
                 
             }

@@ -29,8 +29,10 @@
             setcookie("USERPASS", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
             if(isset($_COOKIE["CART"])) {
                 setcookie("CART", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
-
             }
+            if(isset($_COOKIE["OFFSET"])) 
+            setcookie("OFFSET", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+
             header("Location: ../index.php");
         }
 
@@ -43,14 +45,14 @@
     function deleteCart()
     {
         if (isset($_SESSION["SONGS"])) {
-            unset($_SESSION["CART"]);
+            unset($_SESSION["SONGS"]);
         }
     }
 
-    function deleteVehicle()
+    function deleteIndexSong()
     {
-        if(isset($_COOKIE["VEHICLE"])) 
-            setcookie("VEHICLE", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+        if(isset($_COOKIE["OFFSET"])) 
+            setcookie("OFFSET", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
 
         
     }

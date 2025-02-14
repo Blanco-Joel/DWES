@@ -33,13 +33,13 @@
 		closeConn($connection);
 
 	}
-	function getPrice($id) {
+	function getPrice($id,$units) {
 
 		$connection = openConn();
 		try {
-			$obtainInfo = $connection->prepare("SELECT unitprice as amount from trackid = '$id' ");
+			$obtainInfo = $connection->prepare("SELECT unitprice*$units as amount from track where trackid = '$id' ");
 			$obtainInfo->execute();
-			return $obtainInfo->fetchAll(PDO::FETCH_ASSOC); 
+			return $obtainInfo->fetchColumn(); 
 
 		} catch (PDOException $ex) {
 			echo $ex->getMessage();

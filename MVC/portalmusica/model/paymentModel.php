@@ -1,12 +1,14 @@
 <?php
 	require_once '../bbdd/connect.php';
 
-	function updateRalquileres($veh,$client,$amount,$order) {
+	function insertPayed($client,$amount,$order,$card_country) {
 
 		$connection = openConn();
 		try {
 			$connection->beginTransaction();
-				$insert = $connection->prepare("UPDATE `ralquileres` SET fecha_devolucion = NOW(), preciototal = '$amount',  fechahorapago = NOW(), num_pago = $order where matricula = '$veh' and fecha_devolucion IS NULL ");
+				$insert = $connection->prepare("INSERT INTO `invoice`
+						(`InvoiceId`	  , `CustomerId`, `InvoiceDate`   , `BillingAddress`, `BillingCity`, `BillingState`, `BillingCountry`, `BillingPostalCode`, `Card_Country`, `Total`) 
+				select  '$order',customerid   ,NOW(), address          ,city           , COALESCE(state,NULL), country, COALESCE(postalcountry,NULL), $card_country, '$amount' from customer where customerid = $client");
 				$insert->execute();
 			$connection->commit();
 
@@ -18,23 +20,4 @@
 
 	}	
 
-	function updateRvehiculos($veh) {
-
-		$connection = openConn();
-		try {
-			$connection->beginTransaction();
-				$update = $connection->prepare("UPDATE rvehiculos SET disponible = 'S' where matricula =
-				 '$veh'");
-
-				$update->execute();
-			$connection->commit();
-
-
-		} catch (PDOException $ex) {
-			echo $ex->getMessage();
-		}
-
-		closeConn($connection);
-
-	}
 ?>

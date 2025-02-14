@@ -23,12 +23,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     $decodedData = json_decode($data, true);
     $amount = number_format($decodedData['Ds_Amount']/100,2);
     $order = $decodedData['Ds_Order'];
-    $vehicle = $_COOKIE["VEHICLE"];
+    $card_country = $decodedData['Ds_Card_Country'];
     $idClient = $_COOKIE["USERPASS"];
-    var_dump($amount);
-    deleteVehicle();
     require_once("../model/paymentModel.php");
 
-    updateRalquileres($vehicle,$idClient,$amount,$order);
-    updateRvehiculos($vehicle);
+    insertPayed($idClient,$amount,$order,$card_country);
+    
 ?>

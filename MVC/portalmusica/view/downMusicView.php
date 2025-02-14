@@ -41,7 +41,7 @@ require_once ("../controller/cookieContr.php");
 			if (isset($_SESSION["SONGS"]) ) {
 				echo "<b>cesta</b><br>";
 				foreach ($_SESSION["SONGS"] as $songSelected => $times) {
-					echo  $songSelected ." times listened: " . $times. "<br>";
+					echo  $songSelected ." || times listened: " . $times. "<br>";
 				}
 			}
 
@@ -57,12 +57,12 @@ require_once ("../controller/cookieContr.php");
 				<input type="submit" value="Realizar Alquiler" name="buy" class="btn btn-warning disabled">
 				<input type="submit" value="Vaciar Cesta" name="clear" class="btn btn-warning disabled">
 				<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
-				<?php
-				  if (!empty($button)) 
-				  	echo $button;
-				?>
 			</div>		
 		</form>
+		<?php
+			if (!empty($button)) 
+			echo $button;
+		?>
 	<BR><a href="../controller/logoutContr.php">Cerrar Sesión</a>
 
 	<!-- FIN DEL FORMULARIO -->

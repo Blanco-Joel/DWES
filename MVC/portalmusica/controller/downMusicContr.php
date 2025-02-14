@@ -38,25 +38,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $cart = isset($_SESSION['SONGS']) ?  $_SESSION['SONGS'] : array();
         $cart[$song] = !isset($cart[$song]) ? $cart[$song] = 1   : $cart[$song] += 1;
         $mess .= "Se ha añadido la canción: " . $song . " por ". $cart[$song] ." º vez.<br><br>";
-        var_dump($_SESSION);
         saveCart($cart);
     }
     if (isset($_POST["buy"])) {
         if (isset($_SESSION["SONGS"])) {
+            $visualAmount = 0;
             require_once ("dataContr.php");
-            foreach ($_SESSION["SONGS"] as $song => $id) {
+            foreach ($_SESSION["SONGS"] as $song => $units) {
                 //model/downMusicModel.php
 
-                $visualAmount = getPrice($id);
+                $visualAmount += getPrice($song,$units);
             }
 
-            
-            $amount = $visualAmount*100;
-            $message = "EL PRECIO A PAGAR SON ".$visualAmount. "<br><br>";
+            $amount = floatval($visualAmount)*100;
+            $mess = "EL PRECIO A PAGAR SON ".$visualAmount. "<br><br>";
             $payOrder = getPayOrder();
 
             require_once ("payContr.php");
-            $button = "<form action='https://sis-t.redsys.es:25443/sis/realizarPago' method='POST' target='_blank'>
+            $button = "<br><br>
+                        <form action='https://sis-t.redsys.es:25443/sis/realizarPago' method='POST' target='_blank'>
                             <input type='hidden' name='Ds_SignatureVersion' value='HMAC_SHA256_V1'/>
                             <input type='hidden' name='Ds_MerchantParameters' value='$params'/>
                             <input type='hidden' name='Ds_Signature' value='$firma'/>
@@ -68,16 +68,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }    
 if (isset($_POST["clear"])) {
+    
+    // cookieContr.php
     deleteCart();
 }
 
 if (isset($_POST["Volver"])) {
     header("Location: ../controller/welcomeContr.php");
-    // cookieContr.php
     
+    // cookieContr.php
     deleteIndexSong();
 }
 if (!isset($_COOKIE["OFFSET"])) {
+    
     // cookieContr.php
     makecookie("OFFSET",0);
     $data = getList(0);

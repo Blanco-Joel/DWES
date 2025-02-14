@@ -28,5 +28,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     require_once("../model/paymentModel.php");
 
     insertPayed($idClient,$amount,$order,$card_country);
+    deleteCart();
     
 ?>

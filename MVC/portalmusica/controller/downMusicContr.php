@@ -33,7 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["annadir"])) {
         require_once ("dataContr.php");
         $song = recogerDatos("songs");
-        
+        var_dump($_SESSION["SONGS"]);
+
         //cookieContr.php
         $cart = isset($_SESSION['SONGS']) ?  $_SESSION['SONGS'] : array();
         $cart[$song] = !isset($cart[$song]) ? $cart[$song] = 1   : $cart[$song] += 1;

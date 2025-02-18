@@ -36,20 +36,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         require_once ("dataContr.php");
         $song = recogerDatos("songs");
         var_dump($user);
-        var_dump($_SESSION[$user]);
+        var_dump($_SESSION["SONGS".$user]);
         var_dump($_SESSION);
 
         //cookieContr.php
-        $cart = isset($_SESSION[$user]) ?  $_SESSION[$user] : array();
+        $cart = isset($_SESSION["SONGS".$user]) ?  $_SESSION["SONGS".$user] : array();
         $cart[$song] = !isset($cart[$song]) ? $cart[$song] = 1   : $cart[$song] += 1;
         $mess .= "Se ha añadido la canción: " . $song . " por ". $cart[$song] ." º vez.<br><br>";
         saveCart($cart);
     }
     if (isset($_POST["buy"])) {
-        if (isset($_SESSION[$user])) {
+        if (isset($_SESSION["SONGS".$user])) {
             $visualAmount = 0;
             require_once ("dataContr.php");
-            foreach ($_SESSION[$user] as $song => $units) {
+            foreach ($_SESSION["SONGS".$user] as $song => $units) {
                 //model/downMusicModel.php
 
                 $visualAmount += getPrice($song,$units);

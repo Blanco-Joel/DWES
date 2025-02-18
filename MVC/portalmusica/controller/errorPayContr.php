@@ -7,6 +7,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: ../controller/welcomeContr.php");
 
 }
-deleteVehicle();
 
 ?>

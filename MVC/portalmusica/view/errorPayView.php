@@ -18,7 +18,7 @@ require_once ("../controller/cookieContr.php");
     <div class="container ">
         <!--Aplicacion-->
 		<div class="card border-success mb-3" style="max-width: 30rem;">
-		<div class="card-header">Menú Usuario - OPERACIONES </div>
+		<div class="card-header">User menu  </div>
 		<div class="card-body">
 
 
@@ -27,7 +27,7 @@ require_once ("../controller/cookieContr.php");
 	 
 		
        <!--Formulario con botones -->
-        <p>El pago no se ha realizado.</p>
+        <p>El pago no se ha realizado con exito, se guardará su cesta para la siguiente compra.</p>
 		
         <form action="" method="post">
             <input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">

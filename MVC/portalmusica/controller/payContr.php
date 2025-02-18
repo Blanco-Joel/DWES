@@ -13,7 +13,7 @@
     $miObj->setParameter("DS_MERCHANT_PRODUCTDESCRIPTION", $song);
     $miObj->setParameter("DS_MERCHANT_TRANSACTIONTYPE", "0");
     $miObj->setParameter("DS_MERCHANT_URLOK", "http://192.168.206.204/DWES/MVC/portalmusica/controller/payedContr.php");
-    $miObj->setParameter("DS_MERCHANT_URLKO", "http://192.168.206.204/DWES/MVC/portalmusica/errorPayContr.php");
+    $miObj->setParameter("DS_MERCHANT_URLKO", "http://192.168.206.204/DWES/MVC/portalmusica/controller/errorPayContr.php");
 
     $params = $miObj->createMerchantParameters();
     $claveSHA256 ="sq7HjrUOBfKmC576ILgskD5srU870gJ7";

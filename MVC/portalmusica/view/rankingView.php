@@ -26,22 +26,28 @@ require_once ("../controller/cookieContr.php");
 			
 		<form method="POST" action="">
 			<B>Songs: </B>
-
+   
+				Fecha Desde: <input type='date' name='fechadesde' value='' size=10 placeholder="fechadesde" class="form-control">
+			 	Fecha Hasta: <input type='date' name='fechahasta' value='' size=10 placeholder="fechahasta" class="form-control"><br><br>
 			<?php
-				foreach ($data as $songs => $dt) 
-					echo "<br>" . $dt['visual'];
+				if (!empty($data)) 
+				{
+					foreach ($data as $songs => $dt) 
+						echo "<br>" . $dt['visual'];
+				}
 			?>
 
-
-			<div style="padding-top:1rem;display: flex;justify-content:center">
-				<input style="margin-right:1rem" type="submit" value="<" name="prev" class="btn btn-warning disabled">
-				<input type="submit" value=">" name="next" class="btn btn-warning disabled">
-			</div>
+				<?php 
+				if (isset($_COOKIE["OFFSET"])) {
+					echo "<div style='padding-top:1rem;display: flex;justify-content:center'><input style='margin-right:1rem' type='submit' value='<' name='prev' class='btn btn-warning disabled'><input type='submit' value='>' name='next' class='btn btn-warning disabled'></div>";
+				}
+				?>
 			<?php
 			?>
 		
 			<BR> <BR><BR><BR><BR><BR>
 			<div>
+				<input type="submit" value="Consultar" name="consultar" class="btn btn-warning disabled">
 				<input type="submit" value="Volver" name="Volver" class="btn btn-warning disabled">
 			</div>		
 		</form>

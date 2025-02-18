@@ -17,4 +17,4 @@ require_once '../bbdd/connect.php';
 		closeConn($connection);
 	}
 
-?>
+?> 

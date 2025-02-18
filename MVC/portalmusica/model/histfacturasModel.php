@@ -1,11 +1,11 @@
 <?php
 	require_once '../bbdd/connect.php';
 
-	function getList($index) {
+	function getList($id) {
 
 		$connection = openConn();
 		try {
-			$obtenerInfo = $connection->prepare("SELECT concat(track.trackid,') ',name , ' || Author: ',COALESCE(composer,'desconocido'), '|| Times downloaded : ', sum(quantity)) as visual  from track,invoiceLine where track.trackid = invoiceline.trackid group by invoiceLine.trackid order by sum(quantity) desc limit 20 offset $index ;");
+			$obtenerInfo = $connection->prepare("SELECT (SELECT concat(invoiceId,' ) ', invoiceDate, ' TOTAL : ', total) from invoice,invoiceline  where invoice.invoiceid = invoiceline.invoiceid and costumerId = $id) as cabezera, trackid,unitprice,quantity from invoiceline,invoice where invoice.invoiceid = invoiceline.invoiceid and invoiceid = $index order by invoicelineid;");
 			$obtenerInfo->execute();
 			return $obtenerInfo->fetchAll(PDO::FETCH_ASSOC); 
 

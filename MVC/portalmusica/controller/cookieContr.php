@@ -53,6 +53,13 @@
     {
         if(isset($_COOKIE["OFFSET"])) 
             setcookie("OFFSET", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+        if(isset($_COOKIE["F3"])) 
+            setcookie("F3", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+        if(isset($_COOKIE["F2"])) 
+            setcookie("F2", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+        if(isset($_COOKIE["F1"])) 
+            setcookie("F1", "0", (time() - 3600), "/"); // 86400 segundos = 1 día
+
 
         
     }

@@ -6,7 +6,7 @@ compCookie();
 require_once ("../model/downMusicModel.php");
 $mess ="";
 $user = (string)$_COOKIE['USERPASS'];
-var_dump($_COOKIE);
+    var_dump($_COOKIE);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["next"])) {
         //model/downMusicModel.php
@@ -35,6 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["annadir"])) {
         require_once ("dataContr.php");
         $song = recogerDatos("songs");
+        var_dump($user);
+        var_dump($_SESSION[$user]);
+        var_dump($_SESSION);
 
         //cookieContr.php
         $cart = isset($_SESSION[$user]) ?  $_SESSION[$user] : array();

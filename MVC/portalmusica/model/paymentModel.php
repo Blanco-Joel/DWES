@@ -1,4 +1,8 @@
 <?php
+require_once ("cookieContr.php");
+compCookie();
+session_start();
+
 	require_once '../bbdd/connect.php';
 
 	function insertPayed($client,$amount,$order,$card_country) {
@@ -12,11 +16,10 @@
 
 				$insertInvoice->execute();
 				$cont = 1;
-				$allSongs = $_SESSION["SONGS"];
 
-				foreach($allSongs as $song => $units) {
+				foreach($_SESSION["SONGS"] as $song => $units) {
 					$insertInvoiceLine = $connection->prepare("INSERT INTO `invoiceline` (`InvoiceLineId`, `InvoiceId`, `TrackId`, `UnitPrice`, `Quantity`)
-					select  '$cont',$order,$song,unitprice,$units from track where trackid = '$song'");
+					select  max(invoiceLineId)+1,$order,$song,unitprice,$units from track,invoiceline where invoice.invoiceid = invoiceline.invoiceid and trackid = '$song'");
 
 					$insertInvoiceLine->execute();
 					$cont +=1;

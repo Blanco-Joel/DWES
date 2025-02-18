@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     $card_country = $decodedData['Ds_Card_Country'];
     $idClient = $_COOKIE["USERPASS"];
     require_once("../model/paymentModel.php");
-
+        var_dump($_SESSION);
     insertPayed($idClient,$amount,$order,$card_country);
     deleteCart();
     

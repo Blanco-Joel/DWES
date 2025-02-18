@@ -5,6 +5,8 @@ compCookie();
 
 require_once ("../model/downMusicModel.php");
 $mess ="";
+$user = (string)$_COOKIE['USERPASS'];
+var_dump($_COOKIE);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["next"])) {
         //model/downMusicModel.php
@@ -33,19 +35,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["annadir"])) {
         require_once ("dataContr.php");
         $song = recogerDatos("songs");
-        var_dump($_SESSION["SONGS"]);
 
         //cookieContr.php
-        $cart = isset($_SESSION['SONGS']) ?  $_SESSION['SONGS'] : array();
+        $cart = isset($_SESSION[$user]) ?  $_SESSION[$user] : array();
         $cart[$song] = !isset($cart[$song]) ? $cart[$song] = 1   : $cart[$song] += 1;
         $mess .= "Se ha añadido la canción: " . $song . " por ". $cart[$song] ." º vez.<br><br>";
         saveCart($cart);
     }
     if (isset($_POST["buy"])) {
-        if (isset($_SESSION["SONGS"])) {
+        if (isset($_SESSION[$user])) {
             $visualAmount = 0;
             require_once ("dataContr.php");
-            foreach ($_SESSION["SONGS"] as $song => $units) {
+            foreach ($_SESSION[$user] as $song => $units) {
                 //model/downMusicModel.php
 
                 $visualAmount += getPrice($song,$units);
@@ -67,6 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mess = "No hay canciones en el carro.<br><br>";
         }
     }
+    var_dump($_SESSION);
 }    
 if (isset($_POST["clear"])) {
     

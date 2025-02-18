@@ -38,9 +38,9 @@ require_once ("../controller/cookieContr.php");
 				<input type="submit" value=">" name="next" class="btn btn-warning disabled">
 			</div>
 			<?php
-			if (isset($_SESSION["SONGS"]) ) {
+			if (isset($_SESSION[$_COOKIE['USERPASS']]) ) {
 				echo "<b>cesta</b><br>";
-				foreach ($_SESSION["SONGS"] as $songSelected => $times) {
+				foreach ($_SESSION[$_COOKIE['USERPASS']] as $songSelected => $times) {
 					echo  $songSelected ." || times listened: " . $times. "<br>";
 				}
 			}

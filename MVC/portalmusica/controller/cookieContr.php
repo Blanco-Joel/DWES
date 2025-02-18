@@ -2,7 +2,7 @@
      //Llama a la funcion busquedaBBDD y definirCookie, compara dichos resultados y crea la cookie.
     function makecookie($nombre,$datos)
     {    
-        setcookie($nombre, $datos , time() + (86400 * 30), "/"); // 86400 segundos = 1 día
+        setcookie((string) $nombre,(string)  $datos , time() + (86400 * 30), "/"); // 86400 segundos = 1 día
     }
     //Comprueba la cookie en cada inicio de cada página.
     function compCookie()
@@ -39,13 +39,13 @@
     }
     function saveCart($songData)
     {    
-        $_SESSION["SONGS"] = $songData;
+        $_SESSION[$_COOKIE["USERPASS"]] = $songData;
     }
 
     function deleteCart()
     {
-        if (isset($_SESSION["SONGS"])) {
-            unset($_SESSION["SONGS"]);
+        if (isset($_SESSION[$_COOKIE['USERPASS']])) {
+            unset($_SESSION[$_COOKIE['USERPASS']]);
         }
     }
 

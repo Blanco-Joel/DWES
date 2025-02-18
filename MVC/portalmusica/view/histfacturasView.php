@@ -20,25 +20,24 @@ require_once ("../controller/cookieContr.php");
 		<div class="card border-success mb-3" style="max-width: 60rem;">
 		<div class="card-header">User menu </div>
 		<div class="card-body">
-
-			<B>Welcome: </B> <?php echo $_COOKIE["NAME"]  ?>   <BR><BR>
-			<B>Client id: </B> <?php echo $_COOKIE["USERPASS"]  ?>  <BR><BR>
-			
+		
 		<form method="POST" action="">
-			<B>Payments history: </B>
+			<h3>Payments history: </h3>
 
-			<?php
-				foreach ($data as $songs => $dt) 
-					echo "<br>" . $dt['visual'];
+			<?php 
+				foreach ($data as $datas => $dt) {
+					$group[$dt["vista"]][] = $dt["vista2"];
+				}
+				foreach ($group as $invoice => $list) {
+					echo "<hr><strong>".$invoice."</strong><hr>";
+					foreach ($list as $content) {
+						echo "----".$content."<br>";
+					}
+				}
+
+				
 			?>
 
-
-			<div style="padding-top:1rem;display: flex;justify-content:center">
-				<input style="margin-right:1rem" type="submit" value="<" name="prev" class="btn btn-warning disabled">
-				<input type="submit" value=">" name="next" class="btn btn-warning disabled">
-			</div>
-			<?php
-			?>
 		
 			<BR> <BR><BR><BR><BR><BR>
 			<div>

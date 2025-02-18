@@ -17,9 +17,9 @@ session_start();
 				$insertInvoice->execute();
 				$cont = 1;
 
-				foreach($_SESSION["SONGS"] as $song => $units) {
+				foreach($_SESSION["SONGS".$_COOKIE['USERPASS']]  as $song => $units) {
 					$insertInvoiceLine = $connection->prepare("INSERT INTO `invoiceline` (`InvoiceLineId`, `InvoiceId`, `TrackId`, `UnitPrice`, `Quantity`)
-					select  max(invoiceLineId)+1,$order,$song,unitprice,$units from track,invoiceline where invoice.invoiceid = invoiceline.invoiceid and trackid = '$song'");
+					select  max(invoiceLineId)+1,$order,$song,invoice.unitprice,$units from track,invoiceline where invoice.invoiceid = invoiceline.invoiceid and trackid = '$song'");
 
 					$insertInvoiceLine->execute();
 					$cont +=1;

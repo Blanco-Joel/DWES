@@ -39,13 +39,13 @@
     }
     function saveCart($songData)
     {    
-        $_SESSION[$_COOKIE["USERPASS"]] = $songData;
+        $_SESSION["SONGS".$_COOKIE['USERPASS']] = $songData;
     }
 
     function deleteCart()
     {
-        if (isset($_SESSION[$_COOKIE['USERPASS']])) {
-            unset($_SESSION[$_COOKIE['USERPASS']]);
+        unset($_SESSION["SONGS".$_COOKIE['USERPASS']] );
+        if (isset($_SESSION["SONGS".$_COOKIE['USERPASS']] )) {
         }
     }
 

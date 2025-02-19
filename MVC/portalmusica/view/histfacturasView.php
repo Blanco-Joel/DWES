@@ -25,17 +25,18 @@ require_once ("../controller/cookieContr.php");
 			<h3>Payments history: </h3>
 
 			<?php 
-				foreach ($data as $datas => $dt) {
-					$group[$dt["vista"]][] = $dt["vista2"];
-				}
-				foreach ($group as $invoice => $list) {
-					echo "<hr><strong>".$invoice."</strong><hr>";
-					foreach ($list as $content) {
-						echo "----".$content."<br>";
+				if (!empty($data)) {
+					foreach ($data as $datas => $dt) {
+						$group[$dt["vista"]][] = $dt["vista2"];
 					}
-				}
-
-				
+					foreach ($group as $invoice => $list) {
+						echo "<hr><strong>".$invoice."</strong><hr>";
+						foreach ($list as $content) {
+							echo "----".$content."<br>";
+						}
+					}
+				}else
+					echo "no hay facturas"
 			?>
 
 		

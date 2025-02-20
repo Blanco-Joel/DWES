@@ -1,0 +1,7 @@
+
+Jugador1***5***400
+Jugador2***1.5***0
+Jugador1***1.5***400
+Jugador2***12***0
+Jugador1***1.5***0
+Jugador2***5.5***400
